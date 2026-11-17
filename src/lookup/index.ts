@@ -17,6 +17,9 @@ for (const el of ELEMENTS) {
   for (const localizedName of Object.values(el.names)) {
     BY_KEY.set(localizedName.toLowerCase(), el);
   }
+  if (el.latinName !== undefined) {
+    BY_KEY.set(el.latinName.toLowerCase(), el);
+  }
 }
 
 /**

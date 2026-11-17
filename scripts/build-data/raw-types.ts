@@ -1,4 +1,5 @@
 import type {
+  AtomicMass,
   Block,
   ElementCategory,
   IonizationEnergy,
@@ -13,13 +14,19 @@ import type {
  * This is deliberately *not* the public `Element` shape: `electronConfiguration`
  * and `shells` are derived (see `electron-structure.ts`) from `nobleGasCore` +
  * `valenceConfig` rather than hand-typed, to avoid the 118-way transcription
- * risk of writing out full configurations by hand.
+ * risk of writing out full configurations by hand. Fields that are nullable
+ * (not just optional) on `Element` — radii, electronegativity, electron
+ * affinity, melting/boiling point, density, the two colors — stay plain
+ * optional (`?`) here for terser authoring; `generate.ts` coerces an omitted
+ * field to explicit `null` in the final `Element` record.
  */
 export interface RawElementInput {
   atomicNumber: number;
   symbol: string;
   names: LocalizedNames;
-  atomicMass: { value: number; uncertainty?: number };
+  /** Only present for the ~11 elements with a classical Latin symbol etymology. */
+  latinName?: string;
+  atomicMass: AtomicMass;
   period: number;
   group?: number;
   block: Block;
@@ -41,15 +48,32 @@ export interface RawElementInput {
   density?: number;
   discoveredYear?: number;
   discoveredBy?: string;
-  cpkColor: string;
-  jmolColor: string;
+  cpkColor?: string;
+  jmolColor?: string;
   appearance?: string;
   summary?: string;
 }
 
-/** Builds a `LocalizedNames` record; `la` defaults to the English name. */
-export function names(en: string, ru: string, he: string, la?: string): LocalizedNames {
-  return { en, ru, he, la: la ?? en };
+/** Builds a `LocalizedNames` record (en/ru/he only — see `latinName` for Latin). */
+export function names(en: string, ru: string, he: string): LocalizedNames {
+  return { en, ru, he };
+}
+
+/** Builds an `AtomicMass` with `kind: 'standard'` (a single IUPAC standard atomic weight). */
+export function standardMass(value: number, uncertainty?: number): AtomicMass {
+  return uncertainty === undefined
+    ? { value, kind: 'standard' }
+    : { value, uncertainty, kind: 'standard' };
+}
+
+/** Builds an `AtomicMass` with `kind: 'conventional'` (one of the 12 IUPAC interval elements). */
+export function conventionalMass(value: number): AtomicMass {
+  return { value, kind: 'conventional' };
+}
+
+/** Builds an `AtomicMass` with `kind: 'longest-lived-isotope'` (no IUPAC standard atomic weight). */
+export function isotopeMass(value: number): AtomicMass {
+  return { value, kind: 'longest-lived-isotope' };
 }
 
 /** Builds successive ionization energies (kJ/mol) starting at order 1. */

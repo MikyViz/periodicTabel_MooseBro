@@ -36,7 +36,8 @@
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "typecheck": "tsc --noEmit",
-    "prepublishOnly": "npm run build"
+    "check:todos": "tsx scripts/check-todos.ts",
+    "prepublishOnly": "npm run build && npm run check:todos"
   },
   "keywords": [
     "periodic-table",

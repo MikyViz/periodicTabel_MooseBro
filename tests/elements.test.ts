@@ -116,7 +116,6 @@ describe('element data integrity', () => {
       expect(el.names.en).toBeTruthy();
       expect(el.names.ru).toBeTruthy();
       expect(el.names.he).toBeTruthy();
-      expect(el.names.la).toBeTruthy();
       expect(el.atomicMass.value).toBeGreaterThan(0);
       expect(el.period).toBeGreaterThanOrEqual(1);
       expect(el.period).toBeLessThanOrEqual(7);
@@ -124,8 +123,8 @@ describe('element data integrity', () => {
       expect(el.electronConfiguration.length).toBeGreaterThan(0);
       expect(Array.isArray(el.shells)).toBe(true);
       expect(el.shells.length).toBeGreaterThan(0);
-      expect(el.cpkColor).toMatch(/^#[0-9A-Fa-f]{6}$/);
-      expect(el.jmolColor).toMatch(/^#[0-9A-Fa-f]{6}$/);
+      if (el.cpkColor !== null) expect(el.cpkColor).toMatch(/^#[0-9A-Fa-f]{6}$/);
+      if (el.jmolColor !== null) expect(el.jmolColor).toMatch(/^#[0-9A-Fa-f]{6}$/);
     }
   });
 
@@ -144,9 +143,9 @@ describe('element data integrity', () => {
     }
   });
 
-  it('physical properties fall within physically sane ranges', () => {
-    const checkRange = (value: number | undefined, min: number, max: number) => {
-      if (value !== undefined) {
+  it('physical properties fall within physically sane ranges when known', () => {
+    const checkRange = (value: number | null, min: number, max: number) => {
+      if (value !== null) {
         expect(value).toBeGreaterThanOrEqual(min);
         expect(value).toBeLessThanOrEqual(max);
       }
@@ -157,6 +156,77 @@ describe('element data integrity', () => {
       checkRange(el.boilingPoint, 0, 6200);
       checkRange(el.density, 0, 23);
     }
+  });
+
+  it('nullable physical-property fields are never absent (always number or null)', () => {
+    for (const el of elements) {
+      for (const field of [
+        'electronegativityPauling',
+        'atomicRadius',
+        'covalentRadius',
+        'vdwRadius',
+        'electronAffinity',
+        'meltingPoint',
+        'boilingPoint',
+        'density',
+        'cpkColor',
+        'jmolColor',
+      ] as const) {
+        expect(Object.prototype.hasOwnProperty.call(el, field)).toBe(true);
+      }
+    }
+  });
+
+  it('has no reliable color for the 9 least-characterized superheavy elements', () => {
+    const byClass = new Map<string, Element>(elements.map((el) => [el.symbol, el]));
+    for (const symbol of ['Ds', 'Rg', 'Cn', 'Nh', 'Fl', 'Mc', 'Lv', 'Ts', 'Og']) {
+      expect(byClass.get(symbol)?.cpkColor).toBeNull();
+      expect(byClass.get(symbol)?.jmolColor).toBeNull();
+    }
+  });
+
+  it('only sets latinName for elements with classical Latin symbol etymology', () => {
+    const byClass = new Map<string, Element>(elements.map((el) => [el.symbol, el]));
+    const classical = { Na: 'Natrium', K: 'Kalium', Fe: 'Ferrum', Cu: 'Cuprum', Ag: 'Argentum' };
+    for (const [symbol, latin] of Object.entries(classical)) {
+      expect(byClass.get(symbol)?.latinName).toBe(latin);
+    }
+    expect(byClass.get('O')?.latinName).toBeUndefined();
+    expect(byClass.get('He')?.latinName).toBeUndefined();
+  });
+
+  it('reports the correct atomicMass.kind and value for a representative sample', () => {
+    const byClass = new Map<string, Element>(elements.map((el) => [el.symbol, el]));
+    expect(byClass.get('H')?.atomicMass).toMatchObject({ value: 1.008, kind: 'conventional' });
+    expect(byClass.get('C')?.atomicMass).toMatchObject({ value: 12.011, kind: 'conventional' });
+    expect(byClass.get('Cl')?.atomicMass).toMatchObject({ value: 35.45, kind: 'conventional' });
+    expect(byClass.get('Tc')?.atomicMass).toMatchObject({
+      value: 97,
+      kind: 'longest-lived-isotope',
+    });
+    expect(byClass.get('Pm')?.atomicMass).toMatchObject({
+      value: 145,
+      kind: 'longest-lived-isotope',
+    });
+    expect(byClass.get('Po')?.atomicMass).toMatchObject({
+      value: 209,
+      kind: 'longest-lived-isotope',
+    });
+    expect(byClass.get('Fr')?.atomicMass).toMatchObject({
+      value: 223,
+      kind: 'longest-lived-isotope',
+    });
+    expect(byClass.get('Ra')?.atomicMass).toMatchObject({
+      value: 226,
+      kind: 'longest-lived-isotope',
+    });
+    expect(byClass.get('Og')?.atomicMass).toMatchObject({
+      value: 294,
+      kind: 'longest-lived-isotope',
+    });
+    // U is radioactive but has a published IUPAC standard atomic weight
+    // (consistent terrestrial isotopic composition), unlike Tc/Pm/Po/Fr/Ra/Og.
+    expect(byClass.get('U')?.atomicMass).toMatchObject({ value: 238.02891, kind: 'standard' });
   });
 
   it('known reference elements have the expected key properties', () => {

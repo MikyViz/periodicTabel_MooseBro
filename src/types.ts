@@ -6,17 +6,26 @@
  * - Temperatures are in kelvin (K).
  * - Energies (ionization energy, electron affinity) are in kilojoules per
  *   mole (kJ/mol).
- * - Radii (atomic, covalent, van der Waals) are in picometres (pm).
- * - Density is in grams per cubic centimetre (g/cm³), measured at or near
- *   room temperature for solids/liquids and at standard conditions for gases.
+ * - Radii (atomic, covalent, van der Waals) are in picometres (pm). See each
+ *   field's JSDoc below for the specific scale/source, since "atomic radius"
+ *   in particular is not a single well-defined physical quantity.
+ * - Density is in grams per cubic centimetre (g/cm³). Solids and liquids are
+ *   at 298.15 K (25°C) and 1 atm; gases are at 273.15 K (0°C) and 1 atm
+ *   (the conventional STP reference used for gas density tables), unless a
+ *   dataset note says otherwise.
  * - Atomic mass is in unified atomic mass units (u), equivalently g/mol.
  * - Isotope mass is in unified atomic mass units (u).
  * - Half-life is in seconds.
  *
- * Any field that is not applicable, not experimentally determined, or not yet
- * sourced is modeled as optional (`?`) rather than given a placeholder value
- * such as `0` or `null`, so consumers can distinguish "unknown" from
- * "measured as zero".
+ * Nullability convention: fields modeling a *measured physical property*
+ * (electronegativity, radii, electron affinity, melting/boiling point,
+ * density, the CPK/Jmol colors) are always present but typed `T | null`:
+ * `null` means the property was considered but no reliable value exists for
+ * this element (e.g. He has no melting point at 1 atm; several superheavy
+ * elements have never been characterized). Fields that are optional (`?`)
+ * instead model something that may not *apply* at all (e.g. `group` for
+ * f-block elements, `latinName` for elements with no distinct classical
+ * Latin name, `discoveredYear` for elements known since antiquity).
  */
 
 /** Orbital block an element belongs to. */
@@ -60,33 +69,60 @@ export type DecayMode =
   | (string & {});
 
 /**
- * Localized element names. `en`, `ru`, and `he` are built into the core
- * package; `la` is the Latin name (relevant for elements whose symbol derives
- * from Latin, e.g. `Na` from *natrium*). Additional locale codes may be added
- * via the index signature without a breaking change.
+ * Localized element names (`en`, `ru`, `he` are built into the core
+ * package). The classical Latin name, where it differs from the English
+ * name (e.g. `Na` from *natrium*), is modeled separately on
+ * {@link Element.latinName} rather than here, since it is only defined for
+ * ~11 elements with historical Latin symbol etymology, not all 118.
+ * Additional locale codes may be added via the index signature without a
+ * breaking change.
  */
 export interface LocalizedNames {
   en: string;
   ru: string;
   he: string;
-  /** Latin name, e.g. used to explain symbol etymology (Na = natrium). */
-  la: string;
   [locale: string]: string;
 }
 
 /**
+ * How an element's standard atomic mass was determined, per IUPAC/CIAAW
+ * convention:
+ * - `'standard'`: a single IUPAC standard atomic weight with a reported
+ *   uncertainty, from a consistent terrestrial isotopic composition. This
+ *   also covers Th, Pa, and U, which have IUPAC standard atomic weights
+ *   despite being radioactive (their natural isotopic composition is
+ *   consistent enough to support one).
+ * - `'conventional'`: the element's natural isotopic composition varies
+ *   measurably by source material, so IUPAC publishes an interval; `value`
+ *   here is IUPAC's conventional abridged value for general use (no
+ *   `uncertainty`, since it is not a measurement uncertainty). Exactly 12
+ *   elements currently have this status: H, Li, B, C, N, O, Mg, Si, S, Cl,
+ *   Br, Tl.
+ * - `'longest-lived-isotope'`: the element has no IUPAC standard atomic
+ *   weight at all (no stable isotope and no consistent natural abundance);
+ *   `value` is the mass number of the longest-lived known isotope, per
+ *   common IUPAC bracket-notation convention (e.g. technetium, "[97]").
+ */
+export type AtomicMassKind = 'standard' | 'conventional' | 'longest-lived-isotope';
+
+/**
  * Atomic mass (a.k.a. standard atomic weight), in u (equivalently g/mol).
  * `uncertainty` is the reported standard uncertainty in the last digit(s),
- * in the same unit, when published by the source (e.g. CIAAW).
+ * in the same unit, when published by the source (e.g. CIAAW); it is only
+ * ever present when `kind` is `'standard'`.
  */
 export interface AtomicMass {
   value: number;
   uncertainty?: number;
+  kind: AtomicMassKind;
 }
 
 /**
  * A single ionization energy measurement.
- * `order` is 1 for the first ionization energy, 2 for the second, etc.
+ * `order` is 1 for the first ionization energy, 2 for the second, etc. A
+ * shorter array (or an empty one) simply means higher orders are not known
+ * with enough confidence to include — there is no `null` entry for "unknown
+ * order N", since the array length already encodes that.
  * `value` is in kJ/mol.
  */
 export interface IonizationEnergy {
@@ -121,7 +157,8 @@ export interface DataSource {
 
 /**
  * A chemical element and its physical, chemical, and descriptive properties.
- * See the module-level documentation for unit conventions.
+ * See the module-level documentation for unit conventions and the
+ * `T | null` vs `T | undefined` nullability convention.
  */
 export interface Element {
   /** Proton count (Z); also the element's unique identifier within this library. */
@@ -129,8 +166,16 @@ export interface Element {
   /** IUPAC element symbol, e.g. "Fe". Case-sensitive canonical form. */
   symbol: string;
   names: LocalizedNames;
+  /**
+   * Classical Latin name, only present for the handful of elements whose
+   * symbol derives from a distinct historical Latin name (e.g. `Na` from
+   * *natrium*, `Fe` from *ferrum*). `undefined` for the other ~107
+   * elements, including modern elements whose English name is already a
+   * Neo-Latin scientific coinage.
+   */
+  latinName?: string;
   atomicMass: AtomicMass;
-  /** Periodic table group (column), 1-18. `undefined` for most f-block elements. */
+  /** Periodic table group (column), 1-18. `undefined` for f-block elements. */
   group?: number;
   /** Periodic table period (row), 1-7 (extensible to 8 for future elements). */
   period: number;
@@ -140,33 +185,48 @@ export interface Element {
   electronConfiguration: string;
   /** Electrons per shell, innermost (K) first, e.g. [2, 8, 8, 2] for Ca. */
   shells: readonly number[];
-  /** Pauling electronegativity (dimensionless). */
-  electronegativityPauling?: number;
-  /** Empirical atomic radius, in pm. */
-  atomicRadius?: number;
-  /** Covalent radius, in pm. */
-  covalentRadius?: number;
-  /** Van der Waals radius, in pm. */
-  vdwRadius?: number;
+  /** Pauling electronegativity (dimensionless); `null` if not assigned/known. */
+  electronegativityPauling: number | null;
+  /**
+   * Empirical atomic radius, in pm — the Slater-type empirical radius
+   * compiled by J.C. Slater (1964) and widely reproduced in general
+   * chemistry references. `null` if no reliable value exists.
+   */
+  atomicRadius: number | null;
+  /**
+   * Single-bond covalent radius, in pm, per Cordero et al. (2008),
+   * "Covalent radii revisited", Dalton Trans., 2832-2838. `null` if unknown.
+   */
+  covalentRadius: number | null;
+  /**
+   * Van der Waals radius, in pm, Bondi-type (1964) as commonly extended by
+   * later compilations (e.g. Mantina et al. 2009; Alvarez 2013). `null` if
+   * unknown — most transition metals, lanthanides/actinides, and
+   * superheavy elements have no well-established value.
+   */
+  vdwRadius: number | null;
   /** Successive ionization energies, in kJ/mol, ordered by `order`. */
   ionizationEnergies: readonly IonizationEnergy[];
-  /** Electron affinity, in kJ/mol. Positive values denote energy released. */
-  electronAffinity?: number;
+  /**
+   * Electron affinity, in kJ/mol. Positive values denote energy released.
+   * `null` if not applicable (e.g. no stable anion forms) or not known.
+   */
+  electronAffinity: number | null;
   oxidationStates: readonly OxidationState[];
   standardState: StandardState;
-  /** Melting point, in K. */
-  meltingPoint?: number;
-  /** Boiling point, in K. */
-  boilingPoint?: number;
-  /** Density, in g/cm³. */
-  density?: number;
+  /** Melting point, in K; `null` if unmeasured or not applicable at 1 atm. */
+  meltingPoint: number | null;
+  /** Boiling point, in K; `null` if unmeasured or not applicable at 1 atm. */
+  boilingPoint: number | null;
+  /** Density, in g/cm³ (see module docs for the temperature/pressure convention); `null` if unmeasured. */
+  density: number | null;
   /** Year of discovery or first isolation. `undefined` if known since antiquity. */
   discoveredYear?: number;
   discoveredBy?: string;
-  /** CPK color scheme hex color, e.g. "#ffffff". */
-  cpkColor: string;
-  /** Jmol color scheme hex color, e.g. "#ffffff". */
-  jmolColor: string;
+  /** CPK color scheme hex color, e.g. "#ffffff"; `null` if no confirmed value exists. */
+  cpkColor: string | null;
+  /** Jmol color scheme hex color, e.g. "#ffffff"; `null` if no confirmed value exists. */
+  jmolColor: string | null;
   /** Short free-text description of physical appearance, e.g. "silvery-white". */
   appearance?: string;
   /** Short free-text summary for display in UIs. */

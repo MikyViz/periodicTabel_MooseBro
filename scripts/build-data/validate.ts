@@ -1,4 +1,4 @@
-import type { RawElementInput } from './raw-types.js';
+import type { Element } from '../../src/types.js';
 
 export class DataValidationError extends Error {}
 
@@ -16,14 +16,33 @@ const VALID_CATEGORIES = new Set([
   'unknown',
 ]);
 const VALID_STATES = new Set(['solid', 'liquid', 'gas', 'unknown']);
+const VALID_MASS_KINDS = new Set(['standard', 'conventional', 'longest-lived-isotope']);
 const HEX_COLOR = /^#[0-9A-Fa-f]{6}$/;
 
+/** Validates a nullable numeric field: `null` always passes; a number must be in `[min, max]`. */
+function checkNullableRange(
+  problems: string[],
+  tag: string,
+  field: string,
+  value: number | null,
+  min: number,
+  max: number,
+  unit: string,
+): void {
+  if (value === null) return;
+  if (value < min || value > max) {
+    problems.push(`${tag}: ${field} out of sane range [${String(min)}, ${String(max)}] ${unit}.`);
+  }
+}
+
 /**
- * Validates the raw element dataset before it is compiled into `src/data/elements.ts`.
- * Throws `DataValidationError` with every problem found (not just the first)
- * so a single build failure reports the full list of issues to fix.
+ * Validates the fully-assembled element dataset (after raw -> `Element`
+ * transformation, including the `null`-coercion of unmeasured physical
+ * properties) before it is written to `src/data/elements.ts`. Throws
+ * `DataValidationError` with every problem found (not just the first) so a
+ * single build failure reports the full list of issues to fix.
  */
-export function validateRawElements(elements: readonly RawElementInput[]): void {
+export function validateElements(elements: readonly Element[]): void {
   const problems: string[] = [];
 
   if (elements.length !== 118) {
@@ -52,14 +71,23 @@ export function validateRawElements(elements: readonly RawElementInput[]): void 
     }
     seenSymbols.add(el.symbol);
 
-    for (const locale of ['en', 'ru', 'he', 'la'] as const) {
+    for (const locale of ['en', 'ru', 'he'] as const) {
       if (!el.names[locale] || el.names[locale].trim().length === 0) {
         problems.push(`${tag}: names.${locale} is missing or empty.`);
       }
     }
+    if (el.latinName?.trim().length === 0) {
+      problems.push(`${tag}: latinName is present but empty.`);
+    }
 
     if (!(el.atomicMass.value > 0)) {
       problems.push(`${tag}: atomicMass.value must be positive.`);
+    }
+    if (!VALID_MASS_KINDS.has(el.atomicMass.kind)) {
+      problems.push(`${tag}: invalid atomicMass.kind "${el.atomicMass.kind}".`);
+    }
+    if (el.atomicMass.kind !== 'standard' && el.atomicMass.uncertainty !== undefined) {
+      problems.push(`${tag}: atomicMass.uncertainty should only be set when kind is 'standard'.`);
     }
 
     if (!Number.isInteger(el.period) || el.period < 1 || el.period > 7) {
@@ -78,39 +106,38 @@ export function validateRawElements(elements: readonly RawElementInput[]): void 
       problems.push(`${tag}: invalid standardState "${el.standardState}".`);
     }
 
-    if (
-      el.electronegativityPauling !== undefined &&
-      (el.electronegativityPauling <= 0 || el.electronegativityPauling > 4.5)
-    ) {
-      problems.push(`${tag}: electronegativityPauling out of sane range (0, 4.5].`);
-    }
-    for (const [field, value] of [
-      ['atomicRadius', el.atomicRadius],
-      ['covalentRadius', el.covalentRadius],
-      ['vdwRadius', el.vdwRadius],
-    ] as const) {
-      if (value !== undefined && (value <= 0 || value > 400)) {
-        problems.push(`${tag}: ${field} out of sane range (0, 400] pm.`);
-      }
-    }
-    if (el.meltingPoint !== undefined && (el.meltingPoint < 0 || el.meltingPoint > 4200)) {
-      problems.push(`${tag}: meltingPoint out of sane range [0, 4200] K.`);
-    }
-    if (el.boilingPoint !== undefined && (el.boilingPoint < 0 || el.boilingPoint > 6200)) {
-      problems.push(`${tag}: boilingPoint out of sane range [0, 6200] K.`);
-    }
-    if (el.density !== undefined && (el.density <= 0 || el.density > 23)) {
-      problems.push(`${tag}: density out of sane range (0, 23] g/cm3.`);
-    }
-    if (!HEX_COLOR.test(el.cpkColor)) {
+    checkNullableRange(
+      problems,
+      tag,
+      'electronegativityPauling',
+      el.electronegativityPauling,
+      0,
+      4.5,
+      '(Pauling scale)',
+    );
+    checkNullableRange(problems, tag, 'atomicRadius', el.atomicRadius, 1, 400, 'pm');
+    checkNullableRange(problems, tag, 'covalentRadius', el.covalentRadius, 1, 400, 'pm');
+    checkNullableRange(problems, tag, 'vdwRadius', el.vdwRadius, 1, 400, 'pm');
+    checkNullableRange(problems, tag, 'meltingPoint', el.meltingPoint, 0, 4200, 'K');
+    checkNullableRange(problems, tag, 'boilingPoint', el.boilingPoint, 0, 6200, 'K');
+    checkNullableRange(problems, tag, 'density', el.density, 0.00001, 23, 'g/cm3');
+    checkNullableRange(problems, tag, 'electronAffinity', el.electronAffinity, -50, 400, 'kJ/mol');
+
+    if (el.cpkColor !== null && !HEX_COLOR.test(el.cpkColor)) {
       problems.push(`${tag}: cpkColor "${el.cpkColor}" is not a #RRGGBB hex color.`);
     }
-    if (!HEX_COLOR.test(el.jmolColor)) {
+    if (el.jmolColor !== null && !HEX_COLOR.test(el.jmolColor)) {
       problems.push(`${tag}: jmolColor "${el.jmolColor}" is not a #RRGGBB hex color.`);
     }
     if (el.discoveredYear !== undefined && (el.discoveredYear < 1200 || el.discoveredYear > 2026)) {
       problems.push(`${tag}: discoveredYear out of sane range [1200, 2026].`);
     }
+
+    el.ionizationEnergies.forEach((ionEnergy, i) => {
+      if (ionEnergy.order !== i + 1) {
+        problems.push(`${tag}: ionizationEnergies must be ordered starting at 1, no gaps.`);
+      }
+    });
   }
 
   for (let z = 1; z <= 118; z++) {

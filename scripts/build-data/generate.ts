@@ -12,17 +12,17 @@ import { expandElectronStructure } from './electron-structure.js';
 import { RAW_ELEMENTS } from './raw-elements.js';
 import {
   ATOMIC_MASS_SOURCE,
+  DENSITY_CONDITIONS_SOURCE,
   GROUND_STATE_CONFIG_SOURCE,
+  RADIUS_SCALE_SOURCE,
   REFERENCE_COMPILATION_SOURCE,
 } from './sources.js';
-import { validateRawElements } from './validate.js';
+import { validateElements } from './validate.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const OUTPUT_PATH = resolve(__dirname, '../../src/data/elements.ts');
 
 function build(): void {
-  validateRawElements(RAW_ELEMENTS);
-
   const elements: Element[] = RAW_ELEMENTS.map((raw) => {
     const { electronConfiguration, shells } = expandElectronStructure(
       raw.nobleGasCore,
@@ -41,6 +41,7 @@ function build(): void {
       atomicNumber: raw.atomicNumber,
       symbol: raw.symbol,
       names: raw.names,
+      ...(raw.latinName !== undefined ? { latinName: raw.latinName } : {}),
       atomicMass: raw.atomicMass,
       ...(raw.group !== undefined ? { group: raw.group } : {}),
       period: raw.period,
@@ -48,23 +49,25 @@ function build(): void {
       category: raw.category,
       electronConfiguration,
       shells,
-      ...(raw.electronegativityPauling !== undefined
-        ? { electronegativityPauling: raw.electronegativityPauling }
-        : {}),
-      ...(raw.atomicRadius !== undefined ? { atomicRadius: raw.atomicRadius } : {}),
-      ...(raw.covalentRadius !== undefined ? { covalentRadius: raw.covalentRadius } : {}),
-      ...(raw.vdwRadius !== undefined ? { vdwRadius: raw.vdwRadius } : {}),
+      // Measured-physical-property fields are always present on `Element`,
+      // but nullable: an omitted raw field becomes an explicit `null` here
+      // (see the nullability convention documented in src/types.ts), rather
+      // than silently vanishing from the generated object.
+      electronegativityPauling: raw.electronegativityPauling ?? null,
+      atomicRadius: raw.atomicRadius ?? null,
+      covalentRadius: raw.covalentRadius ?? null,
+      vdwRadius: raw.vdwRadius ?? null,
       ionizationEnergies: raw.ionizationEnergies,
-      ...(raw.electronAffinity !== undefined ? { electronAffinity: raw.electronAffinity } : {}),
+      electronAffinity: raw.electronAffinity ?? null,
       oxidationStates: raw.oxidationStates,
       standardState: raw.standardState,
-      ...(raw.meltingPoint !== undefined ? { meltingPoint: raw.meltingPoint } : {}),
-      ...(raw.boilingPoint !== undefined ? { boilingPoint: raw.boilingPoint } : {}),
-      ...(raw.density !== undefined ? { density: raw.density } : {}),
+      meltingPoint: raw.meltingPoint ?? null,
+      boilingPoint: raw.boilingPoint ?? null,
+      density: raw.density ?? null,
       ...(raw.discoveredYear !== undefined ? { discoveredYear: raw.discoveredYear } : {}),
       ...(raw.discoveredBy !== undefined ? { discoveredBy: raw.discoveredBy } : {}),
-      cpkColor: raw.cpkColor,
-      jmolColor: raw.jmolColor,
+      cpkColor: raw.cpkColor ?? null,
+      jmolColor: raw.jmolColor ?? null,
       ...(raw.appearance !== undefined ? { appearance: raw.appearance } : {}),
       ...(raw.summary !== undefined ? { summary: raw.summary } : {}),
     };
@@ -72,6 +75,8 @@ function build(): void {
   });
 
   elements.sort((a, b) => a.atomicNumber - b.atomicNumber);
+
+  validateElements(elements);
 
   const header = `/**
  * GENERATED FILE — do not edit by hand.
@@ -88,6 +93,14 @@ export const ATOMIC_MASS_SOURCE: DataSource = ${JSON.stringify(ATOMIC_MASS_SOURC
 
 export const GROUND_STATE_CONFIG_SOURCE: DataSource = ${JSON.stringify(
     GROUND_STATE_CONFIG_SOURCE,
+    null,
+    2,
+  )};
+
+export const RADIUS_SCALE_SOURCE: DataSource = ${JSON.stringify(RADIUS_SCALE_SOURCE, null, 2)};
+
+export const DENSITY_CONDITIONS_SOURCE: DataSource = ${JSON.stringify(
+    DENSITY_CONDITIONS_SOURCE,
     null,
     2,
   )};

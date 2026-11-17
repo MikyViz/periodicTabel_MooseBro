@@ -5,7 +5,7 @@
  * scripts/build-data/raw-elements.ts. Edit the raw data and regenerate
  * instead of editing this file directly.
  *
- * Generated at: 2026-11-17T18:56:42.961Z
+ * Generated at: 2026-11-17T19:27:21.218Z
  */
 import type { DataSource, Element } from '../types.js';
 
@@ -14,7 +14,7 @@ export const ATOMIC_MASS_SOURCE: DataSource = {
   "url": "https://ciaaw.org/atomic-weights.htm",
   "license": "Public domain / IUPAC factual data",
   "retrievedAt": "2026-11-17",
-  "notes": "For elements with no IUPAC standard atomic weight (no stable isotopes), the mass number of the longest-lived known isotope is used, per common IUPAC convention."
+  "notes": "See `AtomicMassKind` in src/types.ts for the 'standard' / 'conventional' / 'longest-lived-isotope' distinction. 'conventional' applies to exactly 12 elements (H, Li, B, C, N, O, Mg, Si, S, Cl, Br, Tl) with IUPAC interval atomic weights; 'longest-lived-isotope' applies to elements with no IUPAC standard atomic weight at all, where the mass number of the longest-lived known isotope is used by convention."
 };
 
 export const GROUND_STATE_CONFIG_SOURCE: DataSource = {
@@ -25,11 +25,25 @@ export const GROUND_STATE_CONFIG_SOURCE: DataSource = {
   "notes": "Configurations for Z=104-118 are theoretical predictions (relativistic calculations), not direct measurements; flagged per-element where applicable."
 };
 
+export const RADIUS_SCALE_SOURCE: DataSource = {
+  "name": "atomicRadius: Slater empirical atomic radii (J.C. Slater, J. Chem. Phys. 41, 3199, 1964); covalentRadius: single-bond covalent radii (Cordero et al., Dalton Trans., 2832-2838, 2008); vdwRadius: Bondi-type van der Waals radii (A. Bondi, J. Phys. Chem. 68, 441, 1964), extended per Mantina et al. (J. Phys. Chem. A 113, 5806, 2009) and Alvarez (Dalton Trans. 42, 8617, 2013)",
+  "license": "Values reproduced from these peer-reviewed compilations are factual/physical-constant data",
+  "retrievedAt": "2026-11-17",
+  "notes": "All three are in picometres (pm). `null` means no reliable value exists under that specific scale for that element (common for transition metals/lanthanides/actinides in the vdwRadius case, and for most elements beyond Cf in all three cases)."
+};
+
+export const DENSITY_CONDITIONS_SOURCE: DataSource = {
+  "name": "Density reference conditions",
+  "license": "Factual/physical-constant data",
+  "retrievedAt": "2026-11-17",
+  "notes": "Solids and liquids: density at 298.15 K (25°C) and 1 atm. Gases: density at 273.15 K (0°C) and 1 atm (the conventional STP reference for gas density tables, distinct from the 298.15 K reference used for solids/liquids). `null` if unmeasured."
+};
+
 export const REFERENCE_COMPILATION_SOURCE: DataSource = {
   "name": "Standard reference compilation (CRC Handbook of Chemistry and Physics; NIST WebBook)",
   "license": "Factual/physical-constant data; not copied from any CC BY-SA text",
   "retrievedAt": "2026-11-17",
-  "notes": "TODO(maintainer): verify precision/uncertainty digits for radii, electronegativity, ionization energies beyond the first, electron affinity, melting/boiling point, density, and oxidation states against primary literature before relying on them for publication-grade accuracy."
+  "notes": "TODO(maintainer): verify precision/uncertainty digits for radii, electronegativity, ionization energies beyond the first, electron affinity, melting/boiling point, density, and oxidation states against primary literature before relying on them for publication-grade accuracy. A confidence pass (see chat history) already nulled out the lowest-confidence guesses (flat actinide electronegativity filler, several Bk/Cf/Es thermophysical values, unconfirmed Rf/Db/Sg/Cn ionization energies, and the 9 unconfirmed superheavy-element colors) rather than keep them as invented-looking numbers."
 };
 
 export const ELEMENTS: readonly Element[] = [
@@ -39,11 +53,11 @@ export const ELEMENTS: readonly Element[] = [
     "names": {
       "en": "Hydrogen",
       "ru": "Водород",
-      "he": "מימן",
-      "la": "Hydrogen"
+      "he": "מימן"
     },
     "atomicMass": {
-      "value": 1.008
+      "value": 1.008,
+      "kind": "conventional"
     },
     "group": 1,
     "period": 1,
@@ -91,12 +105,12 @@ export const ELEMENTS: readonly Element[] = [
     "names": {
       "en": "Helium",
       "ru": "Гелий",
-      "he": "הליום",
-      "la": "Helium"
+      "he": "הליום"
     },
     "atomicMass": {
       "value": 4.002602,
-      "uncertainty": 0.000002
+      "uncertainty": 0.000002,
+      "kind": "standard"
     },
     "group": 18,
     "period": 1,
@@ -106,6 +120,7 @@ export const ELEMENTS: readonly Element[] = [
     "shells": [
       2
     ],
+    "electronegativityPauling": null,
     "atomicRadius": 31,
     "covalentRadius": 28,
     "vdwRadius": 140,
@@ -115,8 +130,10 @@ export const ELEMENTS: readonly Element[] = [
         "value": 2372.3
       }
     ],
+    "electronAffinity": null,
     "oxidationStates": [],
     "standardState": "gas",
+    "meltingPoint": null,
     "boilingPoint": 4.222,
     "density": 0.0001786,
     "discoveredYear": 1868,
@@ -132,11 +149,11 @@ export const ELEMENTS: readonly Element[] = [
     "names": {
       "en": "Lithium",
       "ru": "Литий",
-      "he": "ליתיום",
-      "la": "Lithium"
+      "he": "ליתיום"
     },
     "atomicMass": {
-      "value": 6.94
+      "value": 6.94,
+      "kind": "conventional"
     },
     "group": 1,
     "period": 2,
@@ -181,12 +198,12 @@ export const ELEMENTS: readonly Element[] = [
     "names": {
       "en": "Beryllium",
       "ru": "Бериллий",
-      "he": "בריליום",
-      "la": "Beryllium"
+      "he": "בריליום"
     },
     "atomicMass": {
       "value": 9.0121831,
-      "uncertainty": 5e-7
+      "uncertainty": 5e-7,
+      "kind": "standard"
     },
     "group": 2,
     "period": 2,
@@ -207,6 +224,7 @@ export const ELEMENTS: readonly Element[] = [
         "value": 899.5
       }
     ],
+    "electronAffinity": null,
     "oxidationStates": [
       {
         "value": 2,
@@ -229,11 +247,11 @@ export const ELEMENTS: readonly Element[] = [
     "names": {
       "en": "Boron",
       "ru": "Бор",
-      "he": "בורון",
-      "la": "Boron"
+      "he": "בורון"
     },
     "atomicMass": {
-      "value": 10.81
+      "value": 10.81,
+      "kind": "conventional"
     },
     "group": 13,
     "period": 2,
@@ -277,11 +295,11 @@ export const ELEMENTS: readonly Element[] = [
     "names": {
       "en": "Carbon",
       "ru": "Углерод",
-      "he": "פחמן",
-      "la": "Carbon"
+      "he": "פחמן"
     },
     "atomicMass": {
-      "value": 12.011
+      "value": 12.011,
+      "kind": "conventional"
     },
     "group": 14,
     "period": 2,
@@ -332,11 +350,11 @@ export const ELEMENTS: readonly Element[] = [
     "names": {
       "en": "Nitrogen",
       "ru": "Азот",
-      "he": "חנקן",
-      "la": "Nitrogen"
+      "he": "חנקן"
     },
     "atomicMass": {
-      "value": 14.007
+      "value": 14.007,
+      "kind": "conventional"
     },
     "group": 15,
     "period": 2,
@@ -357,6 +375,7 @@ export const ELEMENTS: readonly Element[] = [
         "value": 1402.3
       }
     ],
+    "electronAffinity": null,
     "oxidationStates": [
       {
         "value": -3,
@@ -388,11 +407,11 @@ export const ELEMENTS: readonly Element[] = [
     "names": {
       "en": "Oxygen",
       "ru": "Кислород",
-      "he": "חמצן",
-      "la": "Oxygen"
+      "he": "חמצן"
     },
     "atomicMass": {
-      "value": 15.999
+      "value": 15.999,
+      "kind": "conventional"
     },
     "group": 16,
     "period": 2,
@@ -445,12 +464,12 @@ export const ELEMENTS: readonly Element[] = [
     "names": {
       "en": "Fluorine",
       "ru": "Фтор",
-      "he": "פלואור",
-      "la": "Fluorine"
+      "he": "פלואור"
     },
     "atomicMass": {
       "value": 18.998403163,
-      "uncertainty": 6e-9
+      "uncertainty": 6e-9,
+      "kind": "standard"
     },
     "group": 17,
     "period": 2,
@@ -495,12 +514,12 @@ export const ELEMENTS: readonly Element[] = [
     "names": {
       "en": "Neon",
       "ru": "Неон",
-      "he": "ניאון",
-      "la": "Neon"
+      "he": "ניאון"
     },
     "atomicMass": {
       "value": 20.1797,
-      "uncertainty": 0.0006
+      "uncertainty": 0.0006,
+      "kind": "standard"
     },
     "group": 18,
     "period": 2,
@@ -511,6 +530,7 @@ export const ELEMENTS: readonly Element[] = [
       2,
       8
     ],
+    "electronegativityPauling": null,
     "atomicRadius": 38,
     "covalentRadius": 58,
     "vdwRadius": 154,
@@ -520,6 +540,7 @@ export const ELEMENTS: readonly Element[] = [
         "value": 2080.7
       }
     ],
+    "electronAffinity": null,
     "oxidationStates": [],
     "standardState": "gas",
     "meltingPoint": 24.56,
@@ -538,12 +559,13 @@ export const ELEMENTS: readonly Element[] = [
     "names": {
       "en": "Sodium",
       "ru": "Натрий",
-      "he": "נתרן",
-      "la": "Natrium"
+      "he": "נתרן"
     },
+    "latinName": "Natrium",
     "atomicMass": {
       "value": 22.98976928,
-      "uncertainty": 2e-8
+      "uncertainty": 2e-8,
+      "kind": "standard"
     },
     "group": 1,
     "period": 3,
@@ -588,11 +610,11 @@ export const ELEMENTS: readonly Element[] = [
     "names": {
       "en": "Magnesium",
       "ru": "Магний",
-      "he": "מגנזיום",
-      "la": "Magnesium"
+      "he": "מגנזיום"
     },
     "atomicMass": {
-      "value": 24.305
+      "value": 24.305,
+      "kind": "conventional"
     },
     "group": 2,
     "period": 3,
@@ -614,6 +636,7 @@ export const ELEMENTS: readonly Element[] = [
         "value": 737.7
       }
     ],
+    "electronAffinity": null,
     "oxidationStates": [
       {
         "value": 2,
@@ -636,12 +659,12 @@ export const ELEMENTS: readonly Element[] = [
     "names": {
       "en": "Aluminium",
       "ru": "Алюминий",
-      "he": "אלומיניום",
-      "la": "Aluminium"
+      "he": "אלומיניום"
     },
     "atomicMass": {
       "value": 26.9815384,
-      "uncertainty": 3e-7
+      "uncertainty": 3e-7,
+      "kind": "standard"
     },
     "group": 13,
     "period": 3,
@@ -686,11 +709,11 @@ export const ELEMENTS: readonly Element[] = [
     "names": {
       "en": "Silicon",
       "ru": "Кремний",
-      "he": "צורן",
-      "la": "Silicon"
+      "he": "צורן"
     },
     "atomicMass": {
-      "value": 28.085
+      "value": 28.085,
+      "kind": "conventional"
     },
     "group": 14,
     "period": 3,
@@ -740,12 +763,12 @@ export const ELEMENTS: readonly Element[] = [
     "names": {
       "en": "Phosphorus",
       "ru": "Фосфор",
-      "he": "זרחן",
-      "la": "Phosphorus"
+      "he": "זרחן"
     },
     "atomicMass": {
       "value": 30.973761998,
-      "uncertainty": 5e-9
+      "uncertainty": 5e-9,
+      "kind": "standard"
     },
     "group": 15,
     "period": 3,
@@ -798,11 +821,11 @@ export const ELEMENTS: readonly Element[] = [
     "names": {
       "en": "Sulfur",
       "ru": "Сера",
-      "he": "גופרית",
-      "la": "Sulfur"
+      "he": "גופרית"
     },
     "atomicMass": {
-      "value": 32.06
+      "value": 32.06,
+      "kind": "conventional"
     },
     "group": 16,
     "period": 3,
@@ -853,11 +876,11 @@ export const ELEMENTS: readonly Element[] = [
     "names": {
       "en": "Chlorine",
       "ru": "Хлор",
-      "he": "כלור",
-      "la": "Chlorine"
+      "he": "כלור"
     },
     "atomicMass": {
-      "value": 35.45
+      "value": 35.45,
+      "kind": "conventional"
     },
     "group": 17,
     "period": 3,
@@ -918,11 +941,11 @@ export const ELEMENTS: readonly Element[] = [
     "names": {
       "en": "Argon",
       "ru": "Аргон",
-      "he": "ארגון",
-      "la": "Argon"
+      "he": "ארגון"
     },
     "atomicMass": {
-      "value": 39.95
+      "value": 39.95,
+      "kind": "standard"
     },
     "group": 18,
     "period": 3,
@@ -934,6 +957,7 @@ export const ELEMENTS: readonly Element[] = [
       8,
       8
     ],
+    "electronegativityPauling": null,
     "atomicRadius": 71,
     "covalentRadius": 106,
     "vdwRadius": 188,
@@ -943,6 +967,7 @@ export const ELEMENTS: readonly Element[] = [
         "value": 1520.6
       }
     ],
+    "electronAffinity": null,
     "oxidationStates": [],
     "standardState": "gas",
     "meltingPoint": 83.8,
@@ -960,12 +985,13 @@ export const ELEMENTS: readonly Element[] = [
     "names": {
       "en": "Potassium",
       "ru": "Калий",
-      "he": "אשלגן",
-      "la": "Kalium"
+      "he": "אשלגן"
     },
+    "latinName": "Kalium",
     "atomicMass": {
       "value": 39.0983,
-      "uncertainty": 0.0001
+      "uncertainty": 0.0001,
+      "kind": "standard"
     },
     "group": 1,
     "period": 4,
@@ -1011,12 +1037,12 @@ export const ELEMENTS: readonly Element[] = [
     "names": {
       "en": "Calcium",
       "ru": "Кальций",
-      "he": "סידן",
-      "la": "Calcium"
+      "he": "סידן"
     },
     "atomicMass": {
       "value": 40.078,
-      "uncertainty": 0.004
+      "uncertainty": 0.004,
+      "kind": "standard"
     },
     "group": 2,
     "period": 4,
@@ -1062,12 +1088,12 @@ export const ELEMENTS: readonly Element[] = [
     "names": {
       "en": "Scandium",
       "ru": "Скандий",
-      "he": "סקנדיום",
-      "la": "Scandium"
+      "he": "סקנדיום"
     },
     "atomicMass": {
       "value": 44.955908,
-      "uncertainty": 0.000005
+      "uncertainty": 0.000005,
+      "kind": "standard"
     },
     "group": 3,
     "period": 4,
@@ -1083,6 +1109,7 @@ export const ELEMENTS: readonly Element[] = [
     "electronegativityPauling": 1.36,
     "atomicRadius": 162,
     "covalentRadius": 170,
+    "vdwRadius": null,
     "ionizationEnergies": [
       {
         "order": 1,
@@ -1112,12 +1139,12 @@ export const ELEMENTS: readonly Element[] = [
     "names": {
       "en": "Titanium",
       "ru": "Титан",
-      "he": "טיטניום",
-      "la": "Titanium"
+      "he": "טיטניום"
     },
     "atomicMass": {
       "value": 47.867,
-      "uncertainty": 0.001
+      "uncertainty": 0.001,
+      "kind": "standard"
     },
     "group": 4,
     "period": 4,
@@ -1133,6 +1160,7 @@ export const ELEMENTS: readonly Element[] = [
     "electronegativityPauling": 1.54,
     "atomicRadius": 147,
     "covalentRadius": 160,
+    "vdwRadius": null,
     "ionizationEnergies": [
       {
         "order": 1,
@@ -1170,12 +1198,12 @@ export const ELEMENTS: readonly Element[] = [
     "names": {
       "en": "Vanadium",
       "ru": "Ванадий",
-      "he": "ונדיום",
-      "la": "Vanadium"
+      "he": "ונדיום"
     },
     "atomicMass": {
       "value": 50.9415,
-      "uncertainty": 0.0001
+      "uncertainty": 0.0001,
+      "kind": "standard"
     },
     "group": 5,
     "period": 4,
@@ -1191,6 +1219,7 @@ export const ELEMENTS: readonly Element[] = [
     "electronegativityPauling": 1.63,
     "atomicRadius": 134,
     "covalentRadius": 153,
+    "vdwRadius": null,
     "ionizationEnergies": [
       {
         "order": 1,
@@ -1232,12 +1261,12 @@ export const ELEMENTS: readonly Element[] = [
     "names": {
       "en": "Chromium",
       "ru": "Хром",
-      "he": "כרום",
-      "la": "Chromium"
+      "he": "כרום"
     },
     "atomicMass": {
       "value": 51.9961,
-      "uncertainty": 0.0006
+      "uncertainty": 0.0006,
+      "kind": "standard"
     },
     "group": 6,
     "period": 4,
@@ -1253,6 +1282,7 @@ export const ELEMENTS: readonly Element[] = [
     "electronegativityPauling": 1.66,
     "atomicRadius": 128,
     "covalentRadius": 139,
+    "vdwRadius": null,
     "ionizationEnergies": [
       {
         "order": 1,
@@ -1290,12 +1320,12 @@ export const ELEMENTS: readonly Element[] = [
     "names": {
       "en": "Manganese",
       "ru": "Марганец",
-      "he": "מנגן",
-      "la": "Manganese"
+      "he": "מנגן"
     },
     "atomicMass": {
       "value": 54.938043,
-      "uncertainty": 0.000002
+      "uncertainty": 0.000002,
+      "kind": "standard"
     },
     "group": 7,
     "period": 4,
@@ -1311,12 +1341,14 @@ export const ELEMENTS: readonly Element[] = [
     "electronegativityPauling": 1.55,
     "atomicRadius": 127,
     "covalentRadius": 139,
+    "vdwRadius": null,
     "ionizationEnergies": [
       {
         "order": 1,
         "value": 717.3
       }
     ],
+    "electronAffinity": null,
     "oxidationStates": [
       {
         "value": 2,
@@ -1351,12 +1383,13 @@ export const ELEMENTS: readonly Element[] = [
     "names": {
       "en": "Iron",
       "ru": "Железо",
-      "he": "ברזל",
-      "la": "Ferrum"
+      "he": "ברזל"
     },
+    "latinName": "Ferrum",
     "atomicMass": {
       "value": 55.845,
-      "uncertainty": 0.002
+      "uncertainty": 0.002,
+      "kind": "standard"
     },
     "group": 8,
     "period": 4,
@@ -1372,6 +1405,7 @@ export const ELEMENTS: readonly Element[] = [
     "electronegativityPauling": 1.83,
     "atomicRadius": 126,
     "covalentRadius": 132,
+    "vdwRadius": null,
     "ionizationEnergies": [
       {
         "order": 1,
@@ -1404,12 +1438,12 @@ export const ELEMENTS: readonly Element[] = [
     "names": {
       "en": "Cobalt",
       "ru": "Кобальт",
-      "he": "קובלט",
-      "la": "Cobalt"
+      "he": "קובלט"
     },
     "atomicMass": {
       "value": 58.933194,
-      "uncertainty": 0.000003
+      "uncertainty": 0.000003,
+      "kind": "standard"
     },
     "group": 9,
     "period": 4,
@@ -1425,6 +1459,7 @@ export const ELEMENTS: readonly Element[] = [
     "electronegativityPauling": 1.88,
     "atomicRadius": 125,
     "covalentRadius": 126,
+    "vdwRadius": null,
     "ionizationEnergies": [
       {
         "order": 1,
@@ -1458,12 +1493,12 @@ export const ELEMENTS: readonly Element[] = [
     "names": {
       "en": "Nickel",
       "ru": "Никель",
-      "he": "ניקל",
-      "la": "Nickel"
+      "he": "ניקל"
     },
     "atomicMass": {
       "value": 58.6934,
-      "uncertainty": 0.0004
+      "uncertainty": 0.0004,
+      "kind": "standard"
     },
     "group": 10,
     "period": 4,
@@ -1479,6 +1514,7 @@ export const ELEMENTS: readonly Element[] = [
     "electronegativityPauling": 1.91,
     "atomicRadius": 124,
     "covalentRadius": 124,
+    "vdwRadius": null,
     "ionizationEnergies": [
       {
         "order": 1,
@@ -1512,12 +1548,13 @@ export const ELEMENTS: readonly Element[] = [
     "names": {
       "en": "Copper",
       "ru": "Медь",
-      "he": "נחושת",
-      "la": "Cuprum"
+      "he": "נחושת"
     },
+    "latinName": "Cuprum",
     "atomicMass": {
       "value": 63.546,
-      "uncertainty": 0.003
+      "uncertainty": 0.003,
+      "kind": "standard"
     },
     "group": 11,
     "period": 4,
@@ -1533,6 +1570,7 @@ export const ELEMENTS: readonly Element[] = [
     "electronegativityPauling": 1.9,
     "atomicRadius": 128,
     "covalentRadius": 132,
+    "vdwRadius": null,
     "ionizationEnergies": [
       {
         "order": 1,
@@ -1565,12 +1603,12 @@ export const ELEMENTS: readonly Element[] = [
     "names": {
       "en": "Zinc",
       "ru": "Цинк",
-      "he": "אבץ",
-      "la": "Zinc"
+      "he": "אבץ"
     },
     "atomicMass": {
       "value": 65.38,
-      "uncertainty": 0.02
+      "uncertainty": 0.02,
+      "kind": "standard"
     },
     "group": 12,
     "period": 4,
@@ -1586,12 +1624,14 @@ export const ELEMENTS: readonly Element[] = [
     "electronegativityPauling": 1.65,
     "atomicRadius": 134,
     "covalentRadius": 122,
+    "vdwRadius": null,
     "ionizationEnergies": [
       {
         "order": 1,
         "value": 906.4
       }
     ],
+    "electronAffinity": null,
     "oxidationStates": [
       {
         "value": 2,
@@ -1614,12 +1654,12 @@ export const ELEMENTS: readonly Element[] = [
     "names": {
       "en": "Gallium",
       "ru": "Галлий",
-      "he": "גליום",
-      "la": "Gallium"
+      "he": "גליום"
     },
     "atomicMass": {
       "value": 69.723,
-      "uncertainty": 0.001
+      "uncertainty": 0.001,
+      "kind": "standard"
     },
     "group": 13,
     "period": 4,
@@ -1665,12 +1705,12 @@ export const ELEMENTS: readonly Element[] = [
     "names": {
       "en": "Germanium",
       "ru": "Германий",
-      "he": "גרמניום",
-      "la": "Germanium"
+      "he": "גרמניום"
     },
     "atomicMass": {
       "value": 72.63,
-      "uncertainty": 0.008
+      "uncertainty": 0.008,
+      "kind": "standard"
     },
     "group": 14,
     "period": 4,
@@ -1720,12 +1760,12 @@ export const ELEMENTS: readonly Element[] = [
     "names": {
       "en": "Arsenic",
       "ru": "Мышьяк",
-      "he": "ארסן",
-      "la": "Arsenic"
+      "he": "ארסן"
     },
     "atomicMass": {
       "value": 74.921595,
-      "uncertainty": 0.000006
+      "uncertainty": 0.000006,
+      "kind": "standard"
     },
     "group": 15,
     "period": 4,
@@ -1779,12 +1819,12 @@ export const ELEMENTS: readonly Element[] = [
     "names": {
       "en": "Selenium",
       "ru": "Селен",
-      "he": "סלניום",
-      "la": "Selenium"
+      "he": "סלניום"
     },
     "atomicMass": {
       "value": 78.971,
-      "uncertainty": 0.008
+      "uncertainty": 0.008,
+      "kind": "standard"
     },
     "group": 16,
     "period": 4,
@@ -1838,12 +1878,11 @@ export const ELEMENTS: readonly Element[] = [
     "names": {
       "en": "Bromine",
       "ru": "Бром",
-      "he": "ברום",
-      "la": "Bromine"
+      "he": "ברום"
     },
     "atomicMass": {
       "value": 79.904,
-      "uncertainty": 0.003
+      "kind": "conventional"
     },
     "group": 17,
     "period": 4,
@@ -1898,12 +1937,12 @@ export const ELEMENTS: readonly Element[] = [
     "names": {
       "en": "Krypton",
       "ru": "Криптон",
-      "he": "קריפטון",
-      "la": "Krypton"
+      "he": "קריפטון"
     },
     "atomicMass": {
       "value": 83.798,
-      "uncertainty": 0.002
+      "uncertainty": 0.002,
+      "kind": "standard"
     },
     "group": 18,
     "period": 4,
@@ -1916,6 +1955,7 @@ export const ELEMENTS: readonly Element[] = [
       18,
       8
     ],
+    "electronegativityPauling": null,
     "atomicRadius": 88,
     "covalentRadius": 116,
     "vdwRadius": 202,
@@ -1925,6 +1965,7 @@ export const ELEMENTS: readonly Element[] = [
         "value": 1350.8
       }
     ],
+    "electronAffinity": null,
     "oxidationStates": [
       {
         "value": 2,
@@ -1947,12 +1988,12 @@ export const ELEMENTS: readonly Element[] = [
     "names": {
       "en": "Rubidium",
       "ru": "Рубидий",
-      "he": "רובידיום",
-      "la": "Rubidium"
+      "he": "רובידיום"
     },
     "atomicMass": {
       "value": 85.4678,
-      "uncertainty": 0.0003
+      "uncertainty": 0.0003,
+      "kind": "standard"
     },
     "group": 1,
     "period": 5,
@@ -1999,12 +2040,12 @@ export const ELEMENTS: readonly Element[] = [
     "names": {
       "en": "Strontium",
       "ru": "Стронций",
-      "he": "סטרונציום",
-      "la": "Strontium"
+      "he": "סטרונציום"
     },
     "atomicMass": {
       "value": 87.62,
-      "uncertainty": 0.01
+      "uncertainty": 0.01,
+      "kind": "standard"
     },
     "group": 2,
     "period": 5,
@@ -2051,12 +2092,12 @@ export const ELEMENTS: readonly Element[] = [
     "names": {
       "en": "Yttrium",
       "ru": "Иттрий",
-      "he": "איטריום",
-      "la": "Yttrium"
+      "he": "איטריום"
     },
     "atomicMass": {
       "value": 88.90584,
-      "uncertainty": 0.00001
+      "uncertainty": 0.00001,
+      "kind": "standard"
     },
     "group": 3,
     "period": 5,
@@ -2073,6 +2114,7 @@ export const ELEMENTS: readonly Element[] = [
     "electronegativityPauling": 1.22,
     "atomicRadius": 180,
     "covalentRadius": 190,
+    "vdwRadius": null,
     "ionizationEnergies": [
       {
         "order": 1,
@@ -2102,12 +2144,12 @@ export const ELEMENTS: readonly Element[] = [
     "names": {
       "en": "Zirconium",
       "ru": "Цирконий",
-      "he": "זירקוניום",
-      "la": "Zirconium"
+      "he": "זירקוניום"
     },
     "atomicMass": {
       "value": 91.224,
-      "uncertainty": 0.002
+      "uncertainty": 0.002,
+      "kind": "standard"
     },
     "group": 4,
     "period": 5,
@@ -2124,6 +2166,7 @@ export const ELEMENTS: readonly Element[] = [
     "electronegativityPauling": 1.33,
     "atomicRadius": 160,
     "covalentRadius": 175,
+    "vdwRadius": null,
     "ionizationEnergies": [
       {
         "order": 1,
@@ -2153,12 +2196,12 @@ export const ELEMENTS: readonly Element[] = [
     "names": {
       "en": "Niobium",
       "ru": "Ниобий",
-      "he": "נביוביום",
-      "la": "Niobium"
+      "he": "נביוביום"
     },
     "atomicMass": {
       "value": 92.90637,
-      "uncertainty": 0.00001
+      "uncertainty": 0.00001,
+      "kind": "standard"
     },
     "group": 5,
     "period": 5,
@@ -2175,6 +2218,7 @@ export const ELEMENTS: readonly Element[] = [
     "electronegativityPauling": 1.6,
     "atomicRadius": 146,
     "covalentRadius": 164,
+    "vdwRadius": null,
     "ionizationEnergies": [
       {
         "order": 1,
@@ -2204,12 +2248,12 @@ export const ELEMENTS: readonly Element[] = [
     "names": {
       "en": "Molybdenum",
       "ru": "Молибден",
-      "he": "מוליבדן",
-      "la": "Molybdenum"
+      "he": "מוליבדן"
     },
     "atomicMass": {
       "value": 95.95,
-      "uncertainty": 0.01
+      "uncertainty": 0.01,
+      "kind": "standard"
     },
     "group": 6,
     "period": 5,
@@ -2226,6 +2270,7 @@ export const ELEMENTS: readonly Element[] = [
     "electronegativityPauling": 2.16,
     "atomicRadius": 139,
     "covalentRadius": 154,
+    "vdwRadius": null,
     "ionizationEnergies": [
       {
         "order": 1,
@@ -2263,11 +2308,11 @@ export const ELEMENTS: readonly Element[] = [
     "names": {
       "en": "Technetium",
       "ru": "Технеций",
-      "he": "טכנציום",
-      "la": "Technetium"
+      "he": "טכנציום"
     },
     "atomicMass": {
-      "value": 97
+      "value": 97,
+      "kind": "longest-lived-isotope"
     },
     "group": 7,
     "period": 5,
@@ -2284,12 +2329,14 @@ export const ELEMENTS: readonly Element[] = [
     "electronegativityPauling": 1.9,
     "atomicRadius": 136,
     "covalentRadius": 147,
+    "vdwRadius": null,
     "ionizationEnergies": [
       {
         "order": 1,
         "value": 702
       }
     ],
+    "electronAffinity": null,
     "oxidationStates": [
       {
         "value": 7,
@@ -2313,12 +2360,12 @@ export const ELEMENTS: readonly Element[] = [
     "names": {
       "en": "Ruthenium",
       "ru": "Рутений",
-      "he": "רותניום",
-      "la": "Ruthenium"
+      "he": "רותניום"
     },
     "atomicMass": {
       "value": 101.07,
-      "uncertainty": 0.02
+      "uncertainty": 0.02,
+      "kind": "standard"
     },
     "group": 8,
     "period": 5,
@@ -2335,6 +2382,7 @@ export const ELEMENTS: readonly Element[] = [
     "electronegativityPauling": 2.2,
     "atomicRadius": 134,
     "covalentRadius": 146,
+    "vdwRadius": null,
     "ionizationEnergies": [
       {
         "order": 1,
@@ -2368,12 +2416,12 @@ export const ELEMENTS: readonly Element[] = [
     "names": {
       "en": "Rhodium",
       "ru": "Родий",
-      "he": "רודיום",
-      "la": "Rhodium"
+      "he": "רודיום"
     },
     "atomicMass": {
       "value": 102.90549,
-      "uncertainty": 0.00002
+      "uncertainty": 0.00002,
+      "kind": "standard"
     },
     "group": 9,
     "period": 5,
@@ -2390,6 +2438,7 @@ export const ELEMENTS: readonly Element[] = [
     "electronegativityPauling": 2.28,
     "atomicRadius": 134,
     "covalentRadius": 142,
+    "vdwRadius": null,
     "ionizationEnergies": [
       {
         "order": 1,
@@ -2419,12 +2468,12 @@ export const ELEMENTS: readonly Element[] = [
     "names": {
       "en": "Palladium",
       "ru": "Палладий",
-      "he": "פלדיום",
-      "la": "Palladium"
+      "he": "פלדיום"
     },
     "atomicMass": {
       "value": 106.42,
-      "uncertainty": 0.01
+      "uncertainty": 0.01,
+      "kind": "standard"
     },
     "group": 10,
     "period": 5,
@@ -2440,6 +2489,7 @@ export const ELEMENTS: readonly Element[] = [
     "electronegativityPauling": 2.2,
     "atomicRadius": 137,
     "covalentRadius": 139,
+    "vdwRadius": null,
     "ionizationEnergies": [
       {
         "order": 1,
@@ -2474,12 +2524,13 @@ export const ELEMENTS: readonly Element[] = [
     "names": {
       "en": "Silver",
       "ru": "Серебро",
-      "he": "כסף",
-      "la": "Argentum"
+      "he": "כסף"
     },
+    "latinName": "Argentum",
     "atomicMass": {
       "value": 107.8682,
-      "uncertainty": 0.0002
+      "uncertainty": 0.0002,
+      "kind": "standard"
     },
     "group": 11,
     "period": 5,
@@ -2496,6 +2547,7 @@ export const ELEMENTS: readonly Element[] = [
     "electronegativityPauling": 1.93,
     "atomicRadius": 144,
     "covalentRadius": 145,
+    "vdwRadius": null,
     "ionizationEnergies": [
       {
         "order": 1,
@@ -2524,12 +2576,12 @@ export const ELEMENTS: readonly Element[] = [
     "names": {
       "en": "Cadmium",
       "ru": "Кадмий",
-      "he": "קדמיום",
-      "la": "Cadmium"
+      "he": "קדמיום"
     },
     "atomicMass": {
       "value": 112.414,
-      "uncertainty": 0.004
+      "uncertainty": 0.004,
+      "kind": "standard"
     },
     "group": 12,
     "period": 5,
@@ -2546,12 +2598,14 @@ export const ELEMENTS: readonly Element[] = [
     "electronegativityPauling": 1.69,
     "atomicRadius": 151,
     "covalentRadius": 144,
+    "vdwRadius": null,
     "ionizationEnergies": [
       {
         "order": 1,
         "value": 867.8
       }
     ],
+    "electronAffinity": null,
     "oxidationStates": [
       {
         "value": 2,
@@ -2574,12 +2628,12 @@ export const ELEMENTS: readonly Element[] = [
     "names": {
       "en": "Indium",
       "ru": "Индий",
-      "he": "אינדיום",
-      "la": "Indium"
+      "he": "אינדיום"
     },
     "atomicMass": {
       "value": 114.818,
-      "uncertainty": 0.001
+      "uncertainty": 0.001,
+      "kind": "standard"
     },
     "group": 13,
     "period": 5,
@@ -2626,12 +2680,13 @@ export const ELEMENTS: readonly Element[] = [
     "names": {
       "en": "Tin",
       "ru": "Олово",
-      "he": "בדיל",
-      "la": "Stannum"
+      "he": "בדיל"
     },
+    "latinName": "Stannum",
     "atomicMass": {
       "value": 118.71,
-      "uncertainty": 0.007
+      "uncertainty": 0.007,
+      "kind": "standard"
     },
     "group": 14,
     "period": 5,
@@ -2680,12 +2735,13 @@ export const ELEMENTS: readonly Element[] = [
     "names": {
       "en": "Antimony",
       "ru": "Сурьма",
-      "he": "אנטימון",
-      "la": "Stibium"
+      "he": "אנטימון"
     },
+    "latinName": "Stibium",
     "atomicMass": {
       "value": 121.76,
-      "uncertainty": 0.001
+      "uncertainty": 0.001,
+      "kind": "standard"
     },
     "group": 15,
     "period": 5,
@@ -2738,12 +2794,12 @@ export const ELEMENTS: readonly Element[] = [
     "names": {
       "en": "Tellurium",
       "ru": "Теллур",
-      "he": "טלוריום",
-      "la": "Tellurium"
+      "he": "טלוריום"
     },
     "atomicMass": {
       "value": 127.6,
-      "uncertainty": 0.03
+      "uncertainty": 0.03,
+      "kind": "standard"
     },
     "group": 16,
     "period": 5,
@@ -2798,12 +2854,12 @@ export const ELEMENTS: readonly Element[] = [
     "names": {
       "en": "Iodine",
       "ru": "Йод",
-      "he": "יוד",
-      "la": "Iodine"
+      "he": "יוד"
     },
     "atomicMass": {
       "value": 126.90447,
-      "uncertainty": 0.00003
+      "uncertainty": 0.00003,
+      "kind": "standard"
     },
     "group": 17,
     "period": 5,
@@ -2862,12 +2918,12 @@ export const ELEMENTS: readonly Element[] = [
     "names": {
       "en": "Xenon",
       "ru": "Ксенон",
-      "he": "קסנון",
-      "la": "Xenon"
+      "he": "קסנון"
     },
     "atomicMass": {
       "value": 131.293,
-      "uncertainty": 0.006
+      "uncertainty": 0.006,
+      "kind": "standard"
     },
     "group": 18,
     "period": 5,
@@ -2881,6 +2937,7 @@ export const ELEMENTS: readonly Element[] = [
       18,
       8
     ],
+    "electronegativityPauling": null,
     "atomicRadius": 108,
     "covalentRadius": 140,
     "vdwRadius": 216,
@@ -2890,6 +2947,7 @@ export const ELEMENTS: readonly Element[] = [
         "value": 1170.4
       }
     ],
+    "electronAffinity": null,
     "oxidationStates": [
       {
         "value": 2,
@@ -2920,12 +2978,12 @@ export const ELEMENTS: readonly Element[] = [
     "names": {
       "en": "Caesium",
       "ru": "Цезий",
-      "he": "צזיום",
-      "la": "Caesium"
+      "he": "צזיום"
     },
     "atomicMass": {
       "value": 132.90545196,
-      "uncertainty": 6e-8
+      "uncertainty": 6e-8,
+      "kind": "standard"
     },
     "group": 1,
     "period": 6,
@@ -2973,12 +3031,12 @@ export const ELEMENTS: readonly Element[] = [
     "names": {
       "en": "Barium",
       "ru": "Барий",
-      "he": "בריום",
-      "la": "Barium"
+      "he": "בריום"
     },
     "atomicMass": {
       "value": 137.327,
-      "uncertainty": 0.007
+      "uncertainty": 0.007,
+      "kind": "standard"
     },
     "group": 2,
     "period": 6,
@@ -3026,12 +3084,12 @@ export const ELEMENTS: readonly Element[] = [
     "names": {
       "en": "Lanthanum",
       "ru": "Лантан",
-      "he": "לנתן",
-      "la": "Lanthanum"
+      "he": "לנתן"
     },
     "atomicMass": {
       "value": 138.90547,
-      "uncertainty": 0.00007
+      "uncertainty": 0.00007,
+      "kind": "standard"
     },
     "period": 6,
     "block": "f",
@@ -3048,6 +3106,7 @@ export const ELEMENTS: readonly Element[] = [
     "electronegativityPauling": 1.1,
     "atomicRadius": 187,
     "covalentRadius": 207,
+    "vdwRadius": null,
     "ionizationEnergies": [
       {
         "order": 1,
@@ -3077,12 +3136,12 @@ export const ELEMENTS: readonly Element[] = [
     "names": {
       "en": "Cerium",
       "ru": "Церий",
-      "he": "צריום",
-      "la": "Cerium"
+      "he": "צריום"
     },
     "atomicMass": {
       "value": 140.116,
-      "uncertainty": 0.001
+      "uncertainty": 0.001,
+      "kind": "standard"
     },
     "period": 6,
     "block": "f",
@@ -3099,12 +3158,14 @@ export const ELEMENTS: readonly Element[] = [
     "electronegativityPauling": 1.12,
     "atomicRadius": 182,
     "covalentRadius": 204,
+    "vdwRadius": null,
     "ionizationEnergies": [
       {
         "order": 1,
         "value": 534.4
       }
     ],
+    "electronAffinity": null,
     "oxidationStates": [
       {
         "value": 3,
@@ -3131,12 +3192,12 @@ export const ELEMENTS: readonly Element[] = [
     "names": {
       "en": "Praseodymium",
       "ru": "Празеодим",
-      "he": "פראזאודימיום",
-      "la": "Praseodymium"
+      "he": "פראזאודימיום"
     },
     "atomicMass": {
       "value": 140.90766,
-      "uncertainty": 0.00002
+      "uncertainty": 0.00002,
+      "kind": "standard"
     },
     "period": 6,
     "block": "f",
@@ -3153,12 +3214,14 @@ export const ELEMENTS: readonly Element[] = [
     "electronegativityPauling": 1.13,
     "atomicRadius": 182,
     "covalentRadius": 203,
+    "vdwRadius": null,
     "ionizationEnergies": [
       {
         "order": 1,
         "value": 527
       }
     ],
+    "electronAffinity": null,
     "oxidationStates": [
       {
         "value": 3,
@@ -3181,12 +3244,12 @@ export const ELEMENTS: readonly Element[] = [
     "names": {
       "en": "Neodymium",
       "ru": "Неодим",
-      "he": "נאודימיום",
-      "la": "Neodymium"
+      "he": "נאודימיום"
     },
     "atomicMass": {
       "value": 144.242,
-      "uncertainty": 0.003
+      "uncertainty": 0.003,
+      "kind": "standard"
     },
     "period": 6,
     "block": "f",
@@ -3203,12 +3266,14 @@ export const ELEMENTS: readonly Element[] = [
     "electronegativityPauling": 1.14,
     "atomicRadius": 182,
     "covalentRadius": 201,
+    "vdwRadius": null,
     "ionizationEnergies": [
       {
         "order": 1,
         "value": 533.1
       }
     ],
+    "electronAffinity": null,
     "oxidationStates": [
       {
         "value": 3,
@@ -3231,11 +3296,11 @@ export const ELEMENTS: readonly Element[] = [
     "names": {
       "en": "Promethium",
       "ru": "Прометий",
-      "he": "פרומתיום",
-      "la": "Promethium"
+      "he": "פרומתיום"
     },
     "atomicMass": {
-      "value": 145
+      "value": 145,
+      "kind": "longest-lived-isotope"
     },
     "period": 6,
     "block": "f",
@@ -3252,12 +3317,14 @@ export const ELEMENTS: readonly Element[] = [
     "electronegativityPauling": 1.13,
     "atomicRadius": 181,
     "covalentRadius": 199,
+    "vdwRadius": null,
     "ionizationEnergies": [
       {
         "order": 1,
         "value": 540
       }
     ],
+    "electronAffinity": null,
     "oxidationStates": [
       {
         "value": 3,
@@ -3280,12 +3347,12 @@ export const ELEMENTS: readonly Element[] = [
     "names": {
       "en": "Samarium",
       "ru": "Самарий",
-      "he": "סמריום",
-      "la": "Samarium"
+      "he": "סמריום"
     },
     "atomicMass": {
       "value": 150.36,
-      "uncertainty": 0.02
+      "uncertainty": 0.02,
+      "kind": "standard"
     },
     "period": 6,
     "block": "f",
@@ -3302,12 +3369,14 @@ export const ELEMENTS: readonly Element[] = [
     "electronegativityPauling": 1.17,
     "atomicRadius": 180,
     "covalentRadius": 198,
+    "vdwRadius": null,
     "ionizationEnergies": [
       {
         "order": 1,
         "value": 544.5
       }
     ],
+    "electronAffinity": null,
     "oxidationStates": [
       {
         "value": 3,
@@ -3334,12 +3403,12 @@ export const ELEMENTS: readonly Element[] = [
     "names": {
       "en": "Europium",
       "ru": "Европий",
-      "he": "אירופיום",
-      "la": "Europium"
+      "he": "אירופיום"
     },
     "atomicMass": {
       "value": 151.964,
-      "uncertainty": 0.001
+      "uncertainty": 0.001,
+      "kind": "standard"
     },
     "period": 6,
     "block": "f",
@@ -3353,14 +3422,17 @@ export const ELEMENTS: readonly Element[] = [
       8,
       2
     ],
+    "electronegativityPauling": null,
     "atomicRadius": 204,
     "covalentRadius": 198,
+    "vdwRadius": null,
     "ionizationEnergies": [
       {
         "order": 1,
         "value": 547.1
       }
     ],
+    "electronAffinity": null,
     "oxidationStates": [
       {
         "value": 3,
@@ -3387,12 +3459,12 @@ export const ELEMENTS: readonly Element[] = [
     "names": {
       "en": "Gadolinium",
       "ru": "Гадолиний",
-      "he": "גדוליניום",
-      "la": "Gadolinium"
+      "he": "גדוליניום"
     },
     "atomicMass": {
       "value": 157.25,
-      "uncertainty": 0.03
+      "uncertainty": 0.03,
+      "kind": "standard"
     },
     "period": 6,
     "block": "f",
@@ -3409,12 +3481,14 @@ export const ELEMENTS: readonly Element[] = [
     "electronegativityPauling": 1.2,
     "atomicRadius": 180,
     "covalentRadius": 196,
+    "vdwRadius": null,
     "ionizationEnergies": [
       {
         "order": 1,
         "value": 593.4
       }
     ],
+    "electronAffinity": null,
     "oxidationStates": [
       {
         "value": 3,
@@ -3437,12 +3511,12 @@ export const ELEMENTS: readonly Element[] = [
     "names": {
       "en": "Terbium",
       "ru": "Тербий",
-      "he": "טרביום",
-      "la": "Terbium"
+      "he": "טרביום"
     },
     "atomicMass": {
       "value": 158.925354,
-      "uncertainty": 0.000008
+      "uncertainty": 0.000008,
+      "kind": "standard"
     },
     "period": 6,
     "block": "f",
@@ -3456,14 +3530,17 @@ export const ELEMENTS: readonly Element[] = [
       8,
       2
     ],
+    "electronegativityPauling": null,
     "atomicRadius": 178,
     "covalentRadius": 194,
+    "vdwRadius": null,
     "ionizationEnergies": [
       {
         "order": 1,
         "value": 565.8
       }
     ],
+    "electronAffinity": null,
     "oxidationStates": [
       {
         "value": 3,
@@ -3486,12 +3563,12 @@ export const ELEMENTS: readonly Element[] = [
     "names": {
       "en": "Dysprosium",
       "ru": "Диспрозий",
-      "he": "דיספרוזיום",
-      "la": "Dysprosium"
+      "he": "דיספרוזיום"
     },
     "atomicMass": {
       "value": 162.5,
-      "uncertainty": 0.001
+      "uncertainty": 0.001,
+      "kind": "standard"
     },
     "period": 6,
     "block": "f",
@@ -3508,12 +3585,14 @@ export const ELEMENTS: readonly Element[] = [
     "electronegativityPauling": 1.22,
     "atomicRadius": 177,
     "covalentRadius": 192,
+    "vdwRadius": null,
     "ionizationEnergies": [
       {
         "order": 1,
         "value": 573
       }
     ],
+    "electronAffinity": null,
     "oxidationStates": [
       {
         "value": 3,
@@ -3536,12 +3615,12 @@ export const ELEMENTS: readonly Element[] = [
     "names": {
       "en": "Holmium",
       "ru": "Гольмий",
-      "he": "הולמיום",
-      "la": "Holmium"
+      "he": "הולמיום"
     },
     "atomicMass": {
       "value": 164.930329,
-      "uncertainty": 0.000005
+      "uncertainty": 0.000005,
+      "kind": "standard"
     },
     "period": 6,
     "block": "f",
@@ -3558,12 +3637,14 @@ export const ELEMENTS: readonly Element[] = [
     "electronegativityPauling": 1.23,
     "atomicRadius": 176.6,
     "covalentRadius": 192,
+    "vdwRadius": null,
     "ionizationEnergies": [
       {
         "order": 1,
         "value": 581
       }
     ],
+    "electronAffinity": null,
     "oxidationStates": [
       {
         "value": 3,
@@ -3586,12 +3667,12 @@ export const ELEMENTS: readonly Element[] = [
     "names": {
       "en": "Erbium",
       "ru": "Эрбий",
-      "he": "ארביום",
-      "la": "Erbium"
+      "he": "ארביום"
     },
     "atomicMass": {
       "value": 167.259,
-      "uncertainty": 0.003
+      "uncertainty": 0.003,
+      "kind": "standard"
     },
     "period": 6,
     "block": "f",
@@ -3608,12 +3689,14 @@ export const ELEMENTS: readonly Element[] = [
     "electronegativityPauling": 1.24,
     "atomicRadius": 175.7,
     "covalentRadius": 189,
+    "vdwRadius": null,
     "ionizationEnergies": [
       {
         "order": 1,
         "value": 589.3
       }
     ],
+    "electronAffinity": null,
     "oxidationStates": [
       {
         "value": 3,
@@ -3636,12 +3719,12 @@ export const ELEMENTS: readonly Element[] = [
     "names": {
       "en": "Thulium",
       "ru": "Тулий",
-      "he": "תוליום",
-      "la": "Thulium"
+      "he": "תוליום"
     },
     "atomicMass": {
       "value": 168.934219,
-      "uncertainty": 0.000005
+      "uncertainty": 0.000005,
+      "kind": "standard"
     },
     "period": 6,
     "block": "f",
@@ -3658,12 +3741,14 @@ export const ELEMENTS: readonly Element[] = [
     "electronegativityPauling": 1.25,
     "atomicRadius": 174.6,
     "covalentRadius": 190,
+    "vdwRadius": null,
     "ionizationEnergies": [
       {
         "order": 1,
         "value": 596.7
       }
     ],
+    "electronAffinity": null,
     "oxidationStates": [
       {
         "value": 3,
@@ -3690,12 +3775,12 @@ export const ELEMENTS: readonly Element[] = [
     "names": {
       "en": "Ytterbium",
       "ru": "Иттербий",
-      "he": "איטרביום",
-      "la": "Ytterbium"
+      "he": "איטרביום"
     },
     "atomicMass": {
       "value": 173.045,
-      "uncertainty": 0.01
+      "uncertainty": 0.01,
+      "kind": "standard"
     },
     "period": 6,
     "block": "f",
@@ -3709,14 +3794,17 @@ export const ELEMENTS: readonly Element[] = [
       8,
       2
     ],
+    "electronegativityPauling": null,
     "atomicRadius": 194,
     "covalentRadius": 187,
+    "vdwRadius": null,
     "ionizationEnergies": [
       {
         "order": 1,
         "value": 603.4
       }
     ],
+    "electronAffinity": null,
     "oxidationStates": [
       {
         "value": 3,
@@ -3743,12 +3831,12 @@ export const ELEMENTS: readonly Element[] = [
     "names": {
       "en": "Lutetium",
       "ru": "Лютеций",
-      "he": "לוטציום",
-      "la": "Lutetium"
+      "he": "לוטציום"
     },
     "atomicMass": {
       "value": 174.9668,
-      "uncertainty": 0.0001
+      "uncertainty": 0.0001,
+      "kind": "standard"
     },
     "period": 6,
     "block": "f",
@@ -3765,12 +3853,14 @@ export const ELEMENTS: readonly Element[] = [
     "electronegativityPauling": 1.27,
     "atomicRadius": 173.4,
     "covalentRadius": 187,
+    "vdwRadius": null,
     "ionizationEnergies": [
       {
         "order": 1,
         "value": 523.5
       }
     ],
+    "electronAffinity": null,
     "oxidationStates": [
       {
         "value": 3,
@@ -3794,12 +3884,12 @@ export const ELEMENTS: readonly Element[] = [
     "names": {
       "en": "Hafnium",
       "ru": "Гафний",
-      "he": "הפניום",
-      "la": "Hafnium"
+      "he": "הפניום"
     },
     "atomicMass": {
       "value": 178.49,
-      "uncertainty": 0.02
+      "uncertainty": 0.02,
+      "kind": "standard"
     },
     "group": 4,
     "period": 6,
@@ -3817,12 +3907,14 @@ export const ELEMENTS: readonly Element[] = [
     "electronegativityPauling": 1.3,
     "atomicRadius": 159,
     "covalentRadius": 175,
+    "vdwRadius": null,
     "ionizationEnergies": [
       {
         "order": 1,
         "value": 658.5
       }
     ],
+    "electronAffinity": null,
     "oxidationStates": [
       {
         "value": 4,
@@ -3845,12 +3937,12 @@ export const ELEMENTS: readonly Element[] = [
     "names": {
       "en": "Tantalum",
       "ru": "Тантал",
-      "he": "טנטל",
-      "la": "Tantalum"
+      "he": "טנטל"
     },
     "atomicMass": {
       "value": 180.94788,
-      "uncertainty": 0.00002
+      "uncertainty": 0.00002,
+      "kind": "standard"
     },
     "group": 5,
     "period": 6,
@@ -3868,6 +3960,7 @@ export const ELEMENTS: readonly Element[] = [
     "electronegativityPauling": 1.5,
     "atomicRadius": 146,
     "covalentRadius": 170,
+    "vdwRadius": null,
     "ionizationEnergies": [
       {
         "order": 1,
@@ -3897,12 +3990,13 @@ export const ELEMENTS: readonly Element[] = [
     "names": {
       "en": "Tungsten",
       "ru": "Вольфрам",
-      "he": "טונגסטן",
-      "la": "Wolframium"
+      "he": "טונגסטן"
     },
+    "latinName": "Wolframium",
     "atomicMass": {
       "value": 183.84,
-      "uncertainty": 0.01
+      "uncertainty": 0.01,
+      "kind": "standard"
     },
     "group": 6,
     "period": 6,
@@ -3920,6 +4014,7 @@ export const ELEMENTS: readonly Element[] = [
     "electronegativityPauling": 2.36,
     "atomicRadius": 139,
     "covalentRadius": 162,
+    "vdwRadius": null,
     "ionizationEnergies": [
       {
         "order": 1,
@@ -3950,12 +4045,12 @@ export const ELEMENTS: readonly Element[] = [
     "names": {
       "en": "Rhenium",
       "ru": "Рений",
-      "he": "רניום",
-      "la": "Rhenium"
+      "he": "רניום"
     },
     "atomicMass": {
       "value": 186.207,
-      "uncertainty": 0.001
+      "uncertainty": 0.001,
+      "kind": "standard"
     },
     "group": 7,
     "period": 6,
@@ -3973,6 +4068,7 @@ export const ELEMENTS: readonly Element[] = [
     "electronegativityPauling": 1.9,
     "atomicRadius": 137,
     "covalentRadius": 151,
+    "vdwRadius": null,
     "ionizationEnergies": [
       {
         "order": 1,
@@ -4006,12 +4102,12 @@ export const ELEMENTS: readonly Element[] = [
     "names": {
       "en": "Osmium",
       "ru": "Осмий",
-      "he": "אוסמיום",
-      "la": "Osmium"
+      "he": "אוסמיום"
     },
     "atomicMass": {
       "value": 190.23,
-      "uncertainty": 0.03
+      "uncertainty": 0.03,
+      "kind": "standard"
     },
     "group": 8,
     "period": 6,
@@ -4029,6 +4125,7 @@ export const ELEMENTS: readonly Element[] = [
     "electronegativityPauling": 2.2,
     "atomicRadius": 135,
     "covalentRadius": 144,
+    "vdwRadius": null,
     "ionizationEnergies": [
       {
         "order": 1,
@@ -4059,12 +4156,12 @@ export const ELEMENTS: readonly Element[] = [
     "names": {
       "en": "Iridium",
       "ru": "Иридий",
-      "he": "אירידיום",
-      "la": "Iridium"
+      "he": "אירידיום"
     },
     "atomicMass": {
       "value": 192.217,
-      "uncertainty": 0.002
+      "uncertainty": 0.002,
+      "kind": "standard"
     },
     "group": 9,
     "period": 6,
@@ -4082,6 +4179,7 @@ export const ELEMENTS: readonly Element[] = [
     "electronegativityPauling": 2.2,
     "atomicRadius": 136,
     "covalentRadius": 141,
+    "vdwRadius": null,
     "ionizationEnergies": [
       {
         "order": 1,
@@ -4116,12 +4214,12 @@ export const ELEMENTS: readonly Element[] = [
     "names": {
       "en": "Platinum",
       "ru": "Платина",
-      "he": "פלטינה",
-      "la": "Platinum"
+      "he": "פלטינה"
     },
     "atomicMass": {
       "value": 195.084,
-      "uncertainty": 0.009
+      "uncertainty": 0.009,
+      "kind": "standard"
     },
     "group": 10,
     "period": 6,
@@ -4139,6 +4237,7 @@ export const ELEMENTS: readonly Element[] = [
     "electronegativityPauling": 2.28,
     "atomicRadius": 139,
     "covalentRadius": 136,
+    "vdwRadius": null,
     "ionizationEnergies": [
       {
         "order": 1,
@@ -4172,12 +4271,13 @@ export const ELEMENTS: readonly Element[] = [
     "names": {
       "en": "Gold",
       "ru": "Золото",
-      "he": "זהב",
-      "la": "Aurum"
+      "he": "זהב"
     },
+    "latinName": "Aurum",
     "atomicMass": {
       "value": 196.96657,
-      "uncertainty": 0.00004
+      "uncertainty": 0.00004,
+      "kind": "standard"
     },
     "group": 11,
     "period": 6,
@@ -4195,6 +4295,7 @@ export const ELEMENTS: readonly Element[] = [
     "electronegativityPauling": 2.54,
     "atomicRadius": 144,
     "covalentRadius": 136,
+    "vdwRadius": null,
     "ionizationEnergies": [
       {
         "order": 1,
@@ -4227,12 +4328,13 @@ export const ELEMENTS: readonly Element[] = [
     "names": {
       "en": "Mercury",
       "ru": "Ртуть",
-      "he": "כספית",
-      "la": "Hydrargyrum"
+      "he": "כספית"
     },
+    "latinName": "Hydrargyrum",
     "atomicMass": {
       "value": 200.592,
-      "uncertainty": 0.003
+      "uncertainty": 0.003,
+      "kind": "standard"
     },
     "group": 12,
     "period": 6,
@@ -4257,6 +4359,7 @@ export const ELEMENTS: readonly Element[] = [
         "value": 1007.1
       }
     ],
+    "electronAffinity": null,
     "oxidationStates": [
       {
         "value": 2,
@@ -4282,12 +4385,11 @@ export const ELEMENTS: readonly Element[] = [
     "names": {
       "en": "Thallium",
       "ru": "Таллий",
-      "he": "תליום",
-      "la": "Thallium"
+      "he": "תליום"
     },
     "atomicMass": {
       "value": 204.38,
-      "uncertainty": 0.01
+      "kind": "conventional"
     },
     "group": 13,
     "period": 6,
@@ -4339,12 +4441,13 @@ export const ELEMENTS: readonly Element[] = [
     "names": {
       "en": "Lead",
       "ru": "Свинец",
-      "he": "עופרת",
-      "la": "Plumbum"
+      "he": "עופרת"
     },
+    "latinName": "Plumbum",
     "atomicMass": {
       "value": 207.2,
-      "uncertainty": 0.1
+      "uncertainty": 0.1,
+      "kind": "standard"
     },
     "group": 14,
     "period": 6,
@@ -4395,12 +4498,12 @@ export const ELEMENTS: readonly Element[] = [
     "names": {
       "en": "Bismuth",
       "ru": "Висмут",
-      "he": "ביסמוט",
-      "la": "Bismuth"
+      "he": "ביסמוט"
     },
     "atomicMass": {
       "value": 208.9804,
-      "uncertainty": 0.0001
+      "uncertainty": 0.0001,
+      "kind": "standard"
     },
     "group": 15,
     "period": 6,
@@ -4452,11 +4555,11 @@ export const ELEMENTS: readonly Element[] = [
     "names": {
       "en": "Polonium",
       "ru": "Полоний",
-      "he": "פולוניום",
-      "la": "Polonium"
+      "he": "פולוניום"
     },
     "atomicMass": {
-      "value": 209
+      "value": 209,
+      "kind": "longest-lived-isotope"
     },
     "group": 16,
     "period": 6,
@@ -4472,13 +4575,16 @@ export const ELEMENTS: readonly Element[] = [
       6
     ],
     "electronegativityPauling": 2,
+    "atomicRadius": null,
     "covalentRadius": 140,
+    "vdwRadius": null,
     "ionizationEnergies": [
       {
         "order": 1,
         "value": 812.1
       }
     ],
+    "electronAffinity": null,
     "oxidationStates": [
       {
         "value": 2,
@@ -4505,11 +4611,11 @@ export const ELEMENTS: readonly Element[] = [
     "names": {
       "en": "Astatine",
       "ru": "Астат",
-      "he": "אסטטין",
-      "la": "Astatine"
+      "he": "אסטטין"
     },
     "atomicMass": {
-      "value": 210
+      "value": 210,
+      "kind": "longest-lived-isotope"
     },
     "group": 17,
     "period": 6,
@@ -4525,13 +4631,16 @@ export const ELEMENTS: readonly Element[] = [
       7
     ],
     "electronegativityPauling": 2.2,
+    "atomicRadius": null,
     "covalentRadius": 150,
+    "vdwRadius": null,
     "ionizationEnergies": [
       {
         "order": 1,
         "value": 899
       }
     ],
+    "electronAffinity": null,
     "oxidationStates": [
       {
         "value": -1,
@@ -4544,6 +4653,8 @@ export const ELEMENTS: readonly Element[] = [
     ],
     "standardState": "solid",
     "meltingPoint": 575,
+    "boilingPoint": null,
+    "density": null,
     "discoveredYear": 1940,
     "discoveredBy": "Dale R. Corson, Kenneth Ross MacKenzie, and Emilio Segrè",
     "cpkColor": "#754F45",
@@ -4556,11 +4667,11 @@ export const ELEMENTS: readonly Element[] = [
     "names": {
       "en": "Radon",
       "ru": "Радон",
-      "he": "רדון",
-      "la": "Radon"
+      "he": "רדון"
     },
     "atomicMass": {
-      "value": 222
+      "value": 222,
+      "kind": "longest-lived-isotope"
     },
     "group": 18,
     "period": 6,
@@ -4575,14 +4686,17 @@ export const ELEMENTS: readonly Element[] = [
       18,
       8
     ],
+    "electronegativityPauling": null,
     "atomicRadius": 120,
     "covalentRadius": 150,
+    "vdwRadius": null,
     "ionizationEnergies": [
       {
         "order": 1,
         "value": 1037
       }
     ],
+    "electronAffinity": null,
     "oxidationStates": [],
     "standardState": "gas",
     "meltingPoint": 202,
@@ -4600,11 +4714,11 @@ export const ELEMENTS: readonly Element[] = [
     "names": {
       "en": "Francium",
       "ru": "Франций",
-      "he": "פרנציום",
-      "la": "Francium"
+      "he": "פרנציום"
     },
     "atomicMass": {
-      "value": 223
+      "value": 223,
+      "kind": "longest-lived-isotope"
     },
     "group": 1,
     "period": 7,
@@ -4621,12 +4735,16 @@ export const ELEMENTS: readonly Element[] = [
       1
     ],
     "electronegativityPauling": 0.7,
+    "atomicRadius": null,
+    "covalentRadius": null,
+    "vdwRadius": null,
     "ionizationEnergies": [
       {
         "order": 1,
         "value": 380
       }
     ],
+    "electronAffinity": null,
     "oxidationStates": [
       {
         "value": 1,
@@ -4634,6 +4752,9 @@ export const ELEMENTS: readonly Element[] = [
       }
     ],
     "standardState": "solid",
+    "meltingPoint": null,
+    "boilingPoint": null,
+    "density": null,
     "discoveredYear": 1939,
     "discoveredBy": "Marguerite Perey",
     "cpkColor": "#420066",
@@ -4646,11 +4767,11 @@ export const ELEMENTS: readonly Element[] = [
     "names": {
       "en": "Radium",
       "ru": "Радий",
-      "he": "רדיום",
-      "la": "Radium"
+      "he": "רדיום"
     },
     "atomicMass": {
-      "value": 226
+      "value": 226,
+      "kind": "longest-lived-isotope"
     },
     "group": 2,
     "period": 7,
@@ -4667,13 +4788,16 @@ export const ELEMENTS: readonly Element[] = [
       2
     ],
     "electronegativityPauling": 0.9,
+    "atomicRadius": null,
     "covalentRadius": 221,
+    "vdwRadius": null,
     "ionizationEnergies": [
       {
         "order": 1,
         "value": 509.3
       }
     ],
+    "electronAffinity": null,
     "oxidationStates": [
       {
         "value": 2,
@@ -4696,11 +4820,11 @@ export const ELEMENTS: readonly Element[] = [
     "names": {
       "en": "Actinium",
       "ru": "Актиний",
-      "he": "אקטיניום",
-      "la": "Actinium"
+      "he": "אקטיניום"
     },
     "atomicMass": {
-      "value": 227
+      "value": 227,
+      "kind": "longest-lived-isotope"
     },
     "period": 7,
     "block": "f",
@@ -4716,13 +4840,16 @@ export const ELEMENTS: readonly Element[] = [
       2
     ],
     "electronegativityPauling": 1.1,
+    "atomicRadius": null,
     "covalentRadius": 215,
+    "vdwRadius": null,
     "ionizationEnergies": [
       {
         "order": 1,
         "value": 499
       }
     ],
+    "electronAffinity": null,
     "oxidationStates": [
       {
         "value": 3,
@@ -4745,12 +4872,12 @@ export const ELEMENTS: readonly Element[] = [
     "names": {
       "en": "Thorium",
       "ru": "Торий",
-      "he": "תוריום",
-      "la": "Thorium"
+      "he": "תוריום"
     },
     "atomicMass": {
       "value": 232.0377,
-      "uncertainty": 0.0004
+      "uncertainty": 0.0004,
+      "kind": "standard"
     },
     "period": 7,
     "block": "f",
@@ -4766,13 +4893,16 @@ export const ELEMENTS: readonly Element[] = [
       2
     ],
     "electronegativityPauling": 1.3,
+    "atomicRadius": null,
     "covalentRadius": 206,
+    "vdwRadius": null,
     "ionizationEnergies": [
       {
         "order": 1,
         "value": 587
       }
     ],
+    "electronAffinity": null,
     "oxidationStates": [
       {
         "value": 4,
@@ -4795,12 +4925,12 @@ export const ELEMENTS: readonly Element[] = [
     "names": {
       "en": "Protactinium",
       "ru": "Протактиний",
-      "he": "פרוטקטיניום",
-      "la": "Protactinium"
+      "he": "פרוטקטיניום"
     },
     "atomicMass": {
       "value": 231.03588,
-      "uncertainty": 0.00002
+      "uncertainty": 0.00002,
+      "kind": "standard"
     },
     "period": 7,
     "block": "f",
@@ -4816,13 +4946,16 @@ export const ELEMENTS: readonly Element[] = [
       2
     ],
     "electronegativityPauling": 1.5,
+    "atomicRadius": null,
     "covalentRadius": 200,
+    "vdwRadius": null,
     "ionizationEnergies": [
       {
         "order": 1,
         "value": 568
       }
     ],
+    "electronAffinity": null,
     "oxidationStates": [
       {
         "value": 5,
@@ -4849,12 +4982,12 @@ export const ELEMENTS: readonly Element[] = [
     "names": {
       "en": "Uranium",
       "ru": "Уран",
-      "he": "אורניום",
-      "la": "Uranium"
+      "he": "אורניום"
     },
     "atomicMass": {
       "value": 238.02891,
-      "uncertainty": 0.00003
+      "uncertainty": 0.00003,
+      "kind": "standard"
     },
     "period": 7,
     "block": "f",
@@ -4870,13 +5003,16 @@ export const ELEMENTS: readonly Element[] = [
       2
     ],
     "electronegativityPauling": 1.38,
+    "atomicRadius": null,
     "covalentRadius": 196,
+    "vdwRadius": null,
     "ionizationEnergies": [
       {
         "order": 1,
         "value": 597.6
       }
     ],
+    "electronAffinity": null,
     "oxidationStates": [
       {
         "value": 6,
@@ -4904,11 +5040,11 @@ export const ELEMENTS: readonly Element[] = [
     "names": {
       "en": "Neptunium",
       "ru": "Нептуний",
-      "he": "נפטוניום",
-      "la": "Neptunium"
+      "he": "נפטוניום"
     },
     "atomicMass": {
-      "value": 237
+      "value": 237,
+      "kind": "longest-lived-isotope"
     },
     "period": 7,
     "block": "f",
@@ -4924,13 +5060,16 @@ export const ELEMENTS: readonly Element[] = [
       2
     ],
     "electronegativityPauling": 1.36,
+    "atomicRadius": null,
     "covalentRadius": 190,
+    "vdwRadius": null,
     "ionizationEnergies": [
       {
         "order": 1,
         "value": 604.5
       }
     ],
+    "electronAffinity": null,
     "oxidationStates": [
       {
         "value": 5,
@@ -4965,11 +5104,11 @@ export const ELEMENTS: readonly Element[] = [
     "names": {
       "en": "Plutonium",
       "ru": "Плутоний",
-      "he": "פלוטוניום",
-      "la": "Plutonium"
+      "he": "פלוטוניום"
     },
     "atomicMass": {
-      "value": 244
+      "value": 244,
+      "kind": "longest-lived-isotope"
     },
     "period": 7,
     "block": "f",
@@ -4985,13 +5124,16 @@ export const ELEMENTS: readonly Element[] = [
       2
     ],
     "electronegativityPauling": 1.28,
+    "atomicRadius": null,
     "covalentRadius": 187,
+    "vdwRadius": null,
     "ionizationEnergies": [
       {
         "order": 1,
         "value": 584.7
       }
     ],
+    "electronAffinity": null,
     "oxidationStates": [
       {
         "value": 4,
@@ -5018,11 +5160,11 @@ export const ELEMENTS: readonly Element[] = [
     "names": {
       "en": "Americium",
       "ru": "Америций",
-      "he": "אמריציום",
-      "la": "Americium"
+      "he": "אמריציום"
     },
     "atomicMass": {
-      "value": 243
+      "value": 243,
+      "kind": "longest-lived-isotope"
     },
     "period": 7,
     "block": "f",
@@ -5037,14 +5179,17 @@ export const ELEMENTS: readonly Element[] = [
       8,
       2
     ],
-    "electronegativityPauling": 1.3,
+    "electronegativityPauling": null,
+    "atomicRadius": null,
     "covalentRadius": 180,
+    "vdwRadius": null,
     "ionizationEnergies": [
       {
         "order": 1,
         "value": 578
       }
     ],
+    "electronAffinity": null,
     "oxidationStates": [
       {
         "value": 3,
@@ -5067,11 +5212,11 @@ export const ELEMENTS: readonly Element[] = [
     "names": {
       "en": "Curium",
       "ru": "Кюрий",
-      "he": "קוריום",
-      "la": "Curium"
+      "he": "קוריום"
     },
     "atomicMass": {
-      "value": 247
+      "value": 247,
+      "kind": "longest-lived-isotope"
     },
     "period": 7,
     "block": "f",
@@ -5086,14 +5231,17 @@ export const ELEMENTS: readonly Element[] = [
       9,
       2
     ],
-    "electronegativityPauling": 1.3,
+    "electronegativityPauling": null,
+    "atomicRadius": null,
     "covalentRadius": 169,
+    "vdwRadius": null,
     "ionizationEnergies": [
       {
         "order": 1,
         "value": 581
       }
     ],
+    "electronAffinity": null,
     "oxidationStates": [
       {
         "value": 3,
@@ -5116,11 +5264,11 @@ export const ELEMENTS: readonly Element[] = [
     "names": {
       "en": "Berkelium",
       "ru": "Берклий",
-      "he": "ברקליום",
-      "la": "Berkelium"
+      "he": "ברקליום"
     },
     "atomicMass": {
-      "value": 247
+      "value": 247,
+      "kind": "longest-lived-isotope"
     },
     "period": 7,
     "block": "f",
@@ -5135,13 +5283,17 @@ export const ELEMENTS: readonly Element[] = [
       8,
       2
     ],
-    "electronegativityPauling": 1.3,
+    "electronegativityPauling": null,
+    "atomicRadius": null,
+    "covalentRadius": null,
+    "vdwRadius": null,
     "ionizationEnergies": [
       {
         "order": 1,
         "value": 601
       }
     ],
+    "electronAffinity": null,
     "oxidationStates": [
       {
         "value": 3,
@@ -5153,8 +5305,9 @@ export const ELEMENTS: readonly Element[] = [
       }
     ],
     "standardState": "solid",
-    "meltingPoint": 1259,
-    "density": 14.78,
+    "meltingPoint": null,
+    "boilingPoint": null,
+    "density": null,
     "discoveredYear": 1949,
     "discoveredBy": "Glenn T. Seaborg and collaborators",
     "cpkColor": "#8A4FE3",
@@ -5167,11 +5320,11 @@ export const ELEMENTS: readonly Element[] = [
     "names": {
       "en": "Californium",
       "ru": "Калифорний",
-      "he": "קליפורניום",
-      "la": "Californium"
+      "he": "קליפורניום"
     },
     "atomicMass": {
-      "value": 251
+      "value": 251,
+      "kind": "longest-lived-isotope"
     },
     "period": 7,
     "block": "f",
@@ -5186,13 +5339,17 @@ export const ELEMENTS: readonly Element[] = [
       8,
       2
     ],
-    "electronegativityPauling": 1.3,
+    "electronegativityPauling": null,
+    "atomicRadius": null,
+    "covalentRadius": null,
+    "vdwRadius": null,
     "ionizationEnergies": [
       {
         "order": 1,
         "value": 608
       }
     ],
+    "electronAffinity": null,
     "oxidationStates": [
       {
         "value": 3,
@@ -5200,8 +5357,9 @@ export const ELEMENTS: readonly Element[] = [
       }
     ],
     "standardState": "solid",
-    "meltingPoint": 1173,
-    "density": 15.1,
+    "meltingPoint": null,
+    "boilingPoint": null,
+    "density": null,
     "discoveredYear": 1950,
     "discoveredBy": "Glenn T. Seaborg and collaborators",
     "cpkColor": "#A136D4",
@@ -5214,11 +5372,11 @@ export const ELEMENTS: readonly Element[] = [
     "names": {
       "en": "Einsteinium",
       "ru": "Эйнштейний",
-      "he": "איינשטיניום",
-      "la": "Einsteinium"
+      "he": "איינשטיניום"
     },
     "atomicMass": {
-      "value": 252
+      "value": 252,
+      "kind": "longest-lived-isotope"
     },
     "period": 7,
     "block": "f",
@@ -5233,13 +5391,17 @@ export const ELEMENTS: readonly Element[] = [
       8,
       2
     ],
-    "electronegativityPauling": 1.3,
+    "electronegativityPauling": null,
+    "atomicRadius": null,
+    "covalentRadius": null,
+    "vdwRadius": null,
     "ionizationEnergies": [
       {
         "order": 1,
         "value": 619
       }
     ],
+    "electronAffinity": null,
     "oxidationStates": [
       {
         "value": 3,
@@ -5247,7 +5409,9 @@ export const ELEMENTS: readonly Element[] = [
       }
     ],
     "standardState": "solid",
-    "meltingPoint": 1133,
+    "meltingPoint": null,
+    "boilingPoint": null,
+    "density": null,
     "discoveredYear": 1952,
     "discoveredBy": "Albert Ghiorso and collaborators",
     "cpkColor": "#B31FD4",
@@ -5260,11 +5424,11 @@ export const ELEMENTS: readonly Element[] = [
     "names": {
       "en": "Fermium",
       "ru": "Фермий",
-      "he": "פרמיום",
-      "la": "Fermium"
+      "he": "פרמיום"
     },
     "atomicMass": {
-      "value": 257
+      "value": 257,
+      "kind": "longest-lived-isotope"
     },
     "period": 7,
     "block": "f",
@@ -5279,13 +5443,17 @@ export const ELEMENTS: readonly Element[] = [
       8,
       2
     ],
-    "electronegativityPauling": 1.3,
+    "electronegativityPauling": null,
+    "atomicRadius": null,
+    "covalentRadius": null,
+    "vdwRadius": null,
     "ionizationEnergies": [
       {
         "order": 1,
         "value": 627
       }
     ],
+    "electronAffinity": null,
     "oxidationStates": [
       {
         "value": 3,
@@ -5293,6 +5461,9 @@ export const ELEMENTS: readonly Element[] = [
       }
     ],
     "standardState": "solid",
+    "meltingPoint": null,
+    "boilingPoint": null,
+    "density": null,
     "discoveredYear": 1952,
     "discoveredBy": "Albert Ghiorso and collaborators",
     "cpkColor": "#B31FBA",
@@ -5305,11 +5476,11 @@ export const ELEMENTS: readonly Element[] = [
     "names": {
       "en": "Mendelevium",
       "ru": "Менделевий",
-      "he": "מנדלביום",
-      "la": "Mendelevium"
+      "he": "מנדלביום"
     },
     "atomicMass": {
-      "value": 258
+      "value": 258,
+      "kind": "longest-lived-isotope"
     },
     "period": 7,
     "block": "f",
@@ -5324,13 +5495,17 @@ export const ELEMENTS: readonly Element[] = [
       8,
       2
     ],
-    "electronegativityPauling": 1.3,
+    "electronegativityPauling": null,
+    "atomicRadius": null,
+    "covalentRadius": null,
+    "vdwRadius": null,
     "ionizationEnergies": [
       {
         "order": 1,
         "value": 635
       }
     ],
+    "electronAffinity": null,
     "oxidationStates": [
       {
         "value": 3,
@@ -5342,6 +5517,9 @@ export const ELEMENTS: readonly Element[] = [
       }
     ],
     "standardState": "solid",
+    "meltingPoint": null,
+    "boilingPoint": null,
+    "density": null,
     "discoveredYear": 1955,
     "discoveredBy": "Albert Ghiorso and collaborators",
     "cpkColor": "#B30DA6",
@@ -5354,11 +5532,11 @@ export const ELEMENTS: readonly Element[] = [
     "names": {
       "en": "Nobelium",
       "ru": "Нобелий",
-      "he": "נובליום",
-      "la": "Nobelium"
+      "he": "נובליום"
     },
     "atomicMass": {
-      "value": 259
+      "value": 259,
+      "kind": "longest-lived-isotope"
     },
     "period": 7,
     "block": "f",
@@ -5373,13 +5551,17 @@ export const ELEMENTS: readonly Element[] = [
       8,
       2
     ],
-    "electronegativityPauling": 1.3,
+    "electronegativityPauling": null,
+    "atomicRadius": null,
+    "covalentRadius": null,
+    "vdwRadius": null,
     "ionizationEnergies": [
       {
         "order": 1,
         "value": 642
       }
     ],
+    "electronAffinity": null,
     "oxidationStates": [
       {
         "value": 2,
@@ -5391,6 +5573,9 @@ export const ELEMENTS: readonly Element[] = [
       }
     ],
     "standardState": "solid",
+    "meltingPoint": null,
+    "boilingPoint": null,
+    "density": null,
     "discoveredYear": 1966,
     "discoveredBy": "Joint Institute for Nuclear Research, Dubna",
     "cpkColor": "#BD0D87",
@@ -5403,11 +5588,11 @@ export const ELEMENTS: readonly Element[] = [
     "names": {
       "en": "Lawrencium",
       "ru": "Лоуренсий",
-      "he": "לורנציום",
-      "la": "Lawrencium"
+      "he": "לורנציום"
     },
     "atomicMass": {
-      "value": 262
+      "value": 262,
+      "kind": "longest-lived-isotope"
     },
     "period": 7,
     "block": "f",
@@ -5422,12 +5607,17 @@ export const ELEMENTS: readonly Element[] = [
       8,
       3
     ],
+    "electronegativityPauling": null,
+    "atomicRadius": null,
+    "covalentRadius": null,
+    "vdwRadius": null,
     "ionizationEnergies": [
       {
         "order": 1,
         "value": 478.6
       }
     ],
+    "electronAffinity": null,
     "oxidationStates": [
       {
         "value": 3,
@@ -5435,6 +5625,9 @@ export const ELEMENTS: readonly Element[] = [
       }
     ],
     "standardState": "solid",
+    "meltingPoint": null,
+    "boilingPoint": null,
+    "density": null,
     "discoveredYear": 1961,
     "discoveredBy": "Lawrence Berkeley National Laboratory",
     "cpkColor": "#C70066",
@@ -5447,11 +5640,11 @@ export const ELEMENTS: readonly Element[] = [
     "names": {
       "en": "Rutherfordium",
       "ru": "Резерфордий",
-      "he": "רתרפורדיום",
-      "la": "Rutherfordium"
+      "he": "רתרפורדיום"
     },
     "atomicMass": {
-      "value": 267
+      "value": 267,
+      "kind": "longest-lived-isotope"
     },
     "group": 4,
     "period": 7,
@@ -5467,12 +5660,12 @@ export const ELEMENTS: readonly Element[] = [
       10,
       2
     ],
-    "ionizationEnergies": [
-      {
-        "order": 1,
-        "value": 580
-      }
-    ],
+    "electronegativityPauling": null,
+    "atomicRadius": null,
+    "covalentRadius": null,
+    "vdwRadius": null,
+    "ionizationEnergies": [],
+    "electronAffinity": null,
     "oxidationStates": [
       {
         "value": 4,
@@ -5480,6 +5673,9 @@ export const ELEMENTS: readonly Element[] = [
       }
     ],
     "standardState": "solid",
+    "meltingPoint": null,
+    "boilingPoint": null,
+    "density": null,
     "discoveredYear": 1964,
     "discoveredBy": "Joint Institute for Nuclear Research",
     "cpkColor": "#CC0059",
@@ -5492,11 +5688,11 @@ export const ELEMENTS: readonly Element[] = [
     "names": {
       "en": "Dubnium",
       "ru": "Дубний",
-      "he": "דובניום",
-      "la": "Dubnium"
+      "he": "דובניום"
     },
     "atomicMass": {
-      "value": 268
+      "value": 268,
+      "kind": "longest-lived-isotope"
     },
     "group": 5,
     "period": 7,
@@ -5512,12 +5708,12 @@ export const ELEMENTS: readonly Element[] = [
       11,
       2
     ],
-    "ionizationEnergies": [
-      {
-        "order": 1,
-        "value": 665
-      }
-    ],
+    "electronegativityPauling": null,
+    "atomicRadius": null,
+    "covalentRadius": null,
+    "vdwRadius": null,
+    "ionizationEnergies": [],
+    "electronAffinity": null,
     "oxidationStates": [
       {
         "value": 5,
@@ -5525,6 +5721,9 @@ export const ELEMENTS: readonly Element[] = [
       }
     ],
     "standardState": "solid",
+    "meltingPoint": null,
+    "boilingPoint": null,
+    "density": null,
     "discoveredYear": 1970,
     "discoveredBy": "Joint Institute for Nuclear Research and Lawrence Berkeley National Laboratory",
     "cpkColor": "#D1004F",
@@ -5537,11 +5736,11 @@ export const ELEMENTS: readonly Element[] = [
     "names": {
       "en": "Seaborgium",
       "ru": "Сиборгий",
-      "he": "סיבורגיום",
-      "la": "Seaborgium"
+      "he": "סיבורגיום"
     },
     "atomicMass": {
-      "value": 269
+      "value": 269,
+      "kind": "longest-lived-isotope"
     },
     "group": 6,
     "period": 7,
@@ -5557,12 +5756,12 @@ export const ELEMENTS: readonly Element[] = [
       12,
       2
     ],
-    "ionizationEnergies": [
-      {
-        "order": 1,
-        "value": 757
-      }
-    ],
+    "electronegativityPauling": null,
+    "atomicRadius": null,
+    "covalentRadius": null,
+    "vdwRadius": null,
+    "ionizationEnergies": [],
+    "electronAffinity": null,
     "oxidationStates": [
       {
         "value": 6,
@@ -5570,6 +5769,9 @@ export const ELEMENTS: readonly Element[] = [
       }
     ],
     "standardState": "solid",
+    "meltingPoint": null,
+    "boilingPoint": null,
+    "density": null,
     "discoveredYear": 1974,
     "discoveredBy": "Lawrence Berkeley National Laboratory",
     "cpkColor": "#D90045",
@@ -5582,11 +5784,11 @@ export const ELEMENTS: readonly Element[] = [
     "names": {
       "en": "Bohrium",
       "ru": "Борий",
-      "he": "בוריום",
-      "la": "Bohrium"
+      "he": "בוריום"
     },
     "atomicMass": {
-      "value": 270
+      "value": 270,
+      "kind": "longest-lived-isotope"
     },
     "group": 7,
     "period": 7,
@@ -5602,7 +5804,12 @@ export const ELEMENTS: readonly Element[] = [
       13,
       2
     ],
+    "electronegativityPauling": null,
+    "atomicRadius": null,
+    "covalentRadius": null,
+    "vdwRadius": null,
     "ionizationEnergies": [],
+    "electronAffinity": null,
     "oxidationStates": [
       {
         "value": 7,
@@ -5610,6 +5817,9 @@ export const ELEMENTS: readonly Element[] = [
       }
     ],
     "standardState": "solid",
+    "meltingPoint": null,
+    "boilingPoint": null,
+    "density": null,
     "discoveredYear": 1981,
     "discoveredBy": "GSI Helmholtz Centre for Heavy Ion Research",
     "cpkColor": "#E00038",
@@ -5622,11 +5832,11 @@ export const ELEMENTS: readonly Element[] = [
     "names": {
       "en": "Hassium",
       "ru": "Хассий",
-      "he": "האסיום",
-      "la": "Hassium"
+      "he": "האסיום"
     },
     "atomicMass": {
-      "value": 269
+      "value": 269,
+      "kind": "longest-lived-isotope"
     },
     "group": 8,
     "period": 7,
@@ -5642,7 +5852,12 @@ export const ELEMENTS: readonly Element[] = [
       14,
       2
     ],
+    "electronegativityPauling": null,
+    "atomicRadius": null,
+    "covalentRadius": null,
+    "vdwRadius": null,
     "ionizationEnergies": [],
+    "electronAffinity": null,
     "oxidationStates": [
       {
         "value": 8,
@@ -5650,6 +5865,9 @@ export const ELEMENTS: readonly Element[] = [
       }
     ],
     "standardState": "solid",
+    "meltingPoint": null,
+    "boilingPoint": null,
+    "density": null,
     "discoveredYear": 1984,
     "discoveredBy": "GSI Helmholtz Centre for Heavy Ion Research",
     "cpkColor": "#E6002E",
@@ -5662,11 +5880,11 @@ export const ELEMENTS: readonly Element[] = [
     "names": {
       "en": "Meitnerium",
       "ru": "Мейтнерий",
-      "he": "מייטנריום",
-      "la": "Meitnerium"
+      "he": "מייטנריום"
     },
     "atomicMass": {
-      "value": 278
+      "value": 278,
+      "kind": "longest-lived-isotope"
     },
     "group": 9,
     "period": 7,
@@ -5682,9 +5900,17 @@ export const ELEMENTS: readonly Element[] = [
       15,
       2
     ],
+    "electronegativityPauling": null,
+    "atomicRadius": null,
+    "covalentRadius": null,
+    "vdwRadius": null,
     "ionizationEnergies": [],
+    "electronAffinity": null,
     "oxidationStates": [],
     "standardState": "solid",
+    "meltingPoint": null,
+    "boilingPoint": null,
+    "density": null,
     "discoveredYear": 1982,
     "discoveredBy": "GSI Helmholtz Centre for Heavy Ion Research",
     "cpkColor": "#EB0026",
@@ -5697,11 +5923,11 @@ export const ELEMENTS: readonly Element[] = [
     "names": {
       "en": "Darmstadtium",
       "ru": "Дармштадтий",
-      "he": "דרמשטטיום",
-      "la": "Darmstadtium"
+      "he": "דרמשטטיום"
     },
     "atomicMass": {
-      "value": 281
+      "value": 281,
+      "kind": "longest-lived-isotope"
     },
     "group": 10,
     "period": 7,
@@ -5717,13 +5943,21 @@ export const ELEMENTS: readonly Element[] = [
       16,
       2
     ],
+    "electronegativityPauling": null,
+    "atomicRadius": null,
+    "covalentRadius": null,
+    "vdwRadius": null,
     "ionizationEnergies": [],
+    "electronAffinity": null,
     "oxidationStates": [],
     "standardState": "solid",
+    "meltingPoint": null,
+    "boilingPoint": null,
+    "density": null,
     "discoveredYear": 1994,
     "discoveredBy": "GSI Helmholtz Centre for Heavy Ion Research",
-    "cpkColor": "#E8E8E8",
-    "jmolColor": "#E8E8E8",
+    "cpkColor": null,
+    "jmolColor": null,
     "appearance": "unknown"
   },
   {
@@ -5732,11 +5966,11 @@ export const ELEMENTS: readonly Element[] = [
     "names": {
       "en": "Roentgenium",
       "ru": "Рентгений",
-      "he": "רנטגניום",
-      "la": "Roentgenium"
+      "he": "רנטגניום"
     },
     "atomicMass": {
-      "value": 282
+      "value": 282,
+      "kind": "longest-lived-isotope"
     },
     "group": 11,
     "period": 7,
@@ -5752,13 +5986,21 @@ export const ELEMENTS: readonly Element[] = [
       17,
       2
     ],
+    "electronegativityPauling": null,
+    "atomicRadius": null,
+    "covalentRadius": null,
+    "vdwRadius": null,
     "ionizationEnergies": [],
+    "electronAffinity": null,
     "oxidationStates": [],
     "standardState": "solid",
+    "meltingPoint": null,
+    "boilingPoint": null,
+    "density": null,
     "discoveredYear": 1994,
     "discoveredBy": "GSI Helmholtz Centre for Heavy Ion Research",
-    "cpkColor": "#E8E8E8",
-    "jmolColor": "#E8E8E8",
+    "cpkColor": null,
+    "jmolColor": null,
     "appearance": "unknown"
   },
   {
@@ -5767,11 +6009,11 @@ export const ELEMENTS: readonly Element[] = [
     "names": {
       "en": "Copernicium",
       "ru": "Коперниций",
-      "he": "קופרניציום",
-      "la": "Copernicium"
+      "he": "קופרניציום"
     },
     "atomicMass": {
-      "value": 285
+      "value": 285,
+      "kind": "longest-lived-isotope"
     },
     "group": 12,
     "period": 7,
@@ -5787,18 +6029,21 @@ export const ELEMENTS: readonly Element[] = [
       18,
       2
     ],
-    "ionizationEnergies": [
-      {
-        "order": 1,
-        "value": 1155
-      }
-    ],
+    "electronegativityPauling": null,
+    "atomicRadius": null,
+    "covalentRadius": null,
+    "vdwRadius": null,
+    "ionizationEnergies": [],
+    "electronAffinity": null,
     "oxidationStates": [],
     "standardState": "solid",
+    "meltingPoint": null,
+    "boilingPoint": null,
+    "density": null,
     "discoveredYear": 1996,
     "discoveredBy": "GSI Helmholtz Centre for Heavy Ion Research",
-    "cpkColor": "#E8E8E8",
-    "jmolColor": "#E8E8E8",
+    "cpkColor": null,
+    "jmolColor": null,
     "appearance": "predicted to be a volatile liquid or gas near room temperature, resembling mercury"
   },
   {
@@ -5807,11 +6052,11 @@ export const ELEMENTS: readonly Element[] = [
     "names": {
       "en": "Nihonium",
       "ru": "Нихоний",
-      "he": "ניהוניום",
-      "la": "Nihonium"
+      "he": "ניהוניום"
     },
     "atomicMass": {
-      "value": 286
+      "value": 286,
+      "kind": "longest-lived-isotope"
     },
     "group": 13,
     "period": 7,
@@ -5827,13 +6072,21 @@ export const ELEMENTS: readonly Element[] = [
       18,
       3
     ],
+    "electronegativityPauling": null,
+    "atomicRadius": null,
+    "covalentRadius": null,
+    "vdwRadius": null,
     "ionizationEnergies": [],
+    "electronAffinity": null,
     "oxidationStates": [],
     "standardState": "solid",
+    "meltingPoint": null,
+    "boilingPoint": null,
+    "density": null,
     "discoveredYear": 2004,
     "discoveredBy": "RIKEN",
-    "cpkColor": "#E8E8E8",
-    "jmolColor": "#E8E8E8",
+    "cpkColor": null,
+    "jmolColor": null,
     "appearance": "unknown (predicted to resemble a post-transition metal)"
   },
   {
@@ -5842,11 +6095,11 @@ export const ELEMENTS: readonly Element[] = [
     "names": {
       "en": "Flerovium",
       "ru": "Флеровий",
-      "he": "פלרוביום",
-      "la": "Flerovium"
+      "he": "פלרוביום"
     },
     "atomicMass": {
-      "value": 289
+      "value": 289,
+      "kind": "longest-lived-isotope"
     },
     "group": 14,
     "period": 7,
@@ -5862,13 +6115,21 @@ export const ELEMENTS: readonly Element[] = [
       18,
       4
     ],
+    "electronegativityPauling": null,
+    "atomicRadius": null,
+    "covalentRadius": null,
+    "vdwRadius": null,
     "ionizationEnergies": [],
+    "electronAffinity": null,
     "oxidationStates": [],
     "standardState": "solid",
+    "meltingPoint": null,
+    "boilingPoint": null,
+    "density": null,
     "discoveredYear": 1998,
     "discoveredBy": "Joint Institute for Nuclear Research",
-    "cpkColor": "#E8E8E8",
-    "jmolColor": "#E8E8E8",
+    "cpkColor": null,
+    "jmolColor": null,
     "appearance": "predicted to be an unusually volatile metal, possibly gas-like"
   },
   {
@@ -5877,11 +6138,11 @@ export const ELEMENTS: readonly Element[] = [
     "names": {
       "en": "Moscovium",
       "ru": "Московий",
-      "he": "מוסקוביום",
-      "la": "Moscovium"
+      "he": "מוסקוביום"
     },
     "atomicMass": {
-      "value": 290
+      "value": 290,
+      "kind": "longest-lived-isotope"
     },
     "group": 15,
     "period": 7,
@@ -5897,13 +6158,21 @@ export const ELEMENTS: readonly Element[] = [
       18,
       5
     ],
+    "electronegativityPauling": null,
+    "atomicRadius": null,
+    "covalentRadius": null,
+    "vdwRadius": null,
     "ionizationEnergies": [],
+    "electronAffinity": null,
     "oxidationStates": [],
     "standardState": "solid",
+    "meltingPoint": null,
+    "boilingPoint": null,
+    "density": null,
     "discoveredYear": 2003,
     "discoveredBy": "Joint Institute for Nuclear Research",
-    "cpkColor": "#E8E8E8",
-    "jmolColor": "#E8E8E8",
+    "cpkColor": null,
+    "jmolColor": null,
     "appearance": "unknown (predicted to resemble bismuth)"
   },
   {
@@ -5912,11 +6181,11 @@ export const ELEMENTS: readonly Element[] = [
     "names": {
       "en": "Livermorium",
       "ru": "Ливерморий",
-      "he": "ליברמוריום",
-      "la": "Livermorium"
+      "he": "ליברמוריום"
     },
     "atomicMass": {
-      "value": 293
+      "value": 293,
+      "kind": "longest-lived-isotope"
     },
     "group": 16,
     "period": 7,
@@ -5932,13 +6201,21 @@ export const ELEMENTS: readonly Element[] = [
       18,
       6
     ],
+    "electronegativityPauling": null,
+    "atomicRadius": null,
+    "covalentRadius": null,
+    "vdwRadius": null,
     "ionizationEnergies": [],
+    "electronAffinity": null,
     "oxidationStates": [],
     "standardState": "solid",
+    "meltingPoint": null,
+    "boilingPoint": null,
+    "density": null,
     "discoveredYear": 2000,
     "discoveredBy": "Joint Institute for Nuclear Research",
-    "cpkColor": "#E8E8E8",
-    "jmolColor": "#E8E8E8",
+    "cpkColor": null,
+    "jmolColor": null,
     "appearance": "unknown (predicted to resemble polonium)"
   },
   {
@@ -5947,11 +6224,11 @@ export const ELEMENTS: readonly Element[] = [
     "names": {
       "en": "Tennessine",
       "ru": "Теннессин",
-      "he": "טנסין",
-      "la": "Tennessine"
+      "he": "טנסין"
     },
     "atomicMass": {
-      "value": 294
+      "value": 294,
+      "kind": "longest-lived-isotope"
     },
     "group": 17,
     "period": 7,
@@ -5967,7 +6244,12 @@ export const ELEMENTS: readonly Element[] = [
       18,
       7
     ],
+    "electronegativityPauling": null,
+    "atomicRadius": null,
+    "covalentRadius": null,
+    "vdwRadius": null,
     "ionizationEnergies": [],
+    "electronAffinity": null,
     "oxidationStates": [
       {
         "value": -1,
@@ -5979,10 +6261,13 @@ export const ELEMENTS: readonly Element[] = [
       }
     ],
     "standardState": "solid",
+    "meltingPoint": null,
+    "boilingPoint": null,
+    "density": null,
     "discoveredYear": 2010,
     "discoveredBy": "Joint Institute for Nuclear Research and Oak Ridge National Laboratory",
-    "cpkColor": "#E8E8E8",
-    "jmolColor": "#E8E8E8",
+    "cpkColor": null,
+    "jmolColor": null,
     "appearance": "unknown (predicted to be a volatile, metallic-looking halogen analogue)"
   },
   {
@@ -5991,11 +6276,11 @@ export const ELEMENTS: readonly Element[] = [
     "names": {
       "en": "Oganesson",
       "ru": "Оганесон",
-      "he": "אוגנסון",
-      "la": "Oganesson"
+      "he": "אוגנסון"
     },
     "atomicMass": {
-      "value": 294
+      "value": 294,
+      "kind": "longest-lived-isotope"
     },
     "group": 18,
     "period": 7,
@@ -6011,13 +6296,21 @@ export const ELEMENTS: readonly Element[] = [
       18,
       8
     ],
+    "electronegativityPauling": null,
+    "atomicRadius": null,
+    "covalentRadius": null,
+    "vdwRadius": null,
     "ionizationEnergies": [],
+    "electronAffinity": null,
     "oxidationStates": [],
     "standardState": "solid",
+    "meltingPoint": null,
+    "boilingPoint": null,
+    "density": null,
     "discoveredYear": 2002,
     "discoveredBy": "Joint Institute for Nuclear Research",
-    "cpkColor": "#E8E8E8",
-    "jmolColor": "#E8E8E8",
+    "cpkColor": null,
+    "jmolColor": null,
     "appearance": "unknown; predicted to be a solid at room temperature, unlike the lighter noble gases"
   }
 ];

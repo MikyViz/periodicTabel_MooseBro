@@ -9,6 +9,7 @@
 
 export type {
   AtomicMass,
+  AtomicMassKind,
   Block,
   DataSource,
   DecayMode,
@@ -25,7 +26,9 @@ export { InvalidFormulaError, UnknownElementError } from './errors.js';
 
 export {
   ATOMIC_MASS_SOURCE,
+  DENSITY_CONDITIONS_SOURCE,
   GROUND_STATE_CONFIG_SOURCE,
+  RADIUS_SCALE_SOURCE,
   REFERENCE_COMPILATION_SOURCE,
 } from './data/elements.js';
 
