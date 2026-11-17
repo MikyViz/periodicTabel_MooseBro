@@ -17,10 +17,10 @@
 import { NoStandardAtomicWeightError } from '../errors.js';
 import { ELEMENTS } from '../data/elements.js';
 import type { AtomicMass } from '../types.js';
-import { parseFormulaCounts } from './parser.js';
+import { parseFormulaCounts, type FormulaOptions } from './parser.js';
 
 /** Options shared by {@link molarMass} and {@link composition}. */
-export interface MolarMassOptions {
+export interface MolarMassOptions extends FormulaOptions {
   /**
    * When `true`, elements with no IUPAC standard atomic weight use the mass
    * of their longest-lived known isotope instead of throwing
@@ -51,7 +51,7 @@ function resolveAtomicMassValue(symbol: string, options: MolarMassOptions | unde
  * `atomicMass.value * count` over every element in the parsed formula.
  */
 export function molarMass(formula: string, options?: MolarMassOptions): number {
-  const counts = parseFormulaCounts(formula);
+  const counts = parseFormulaCounts(formula, options);
   let total = 0;
   for (const [symbol, count] of counts) {
     total += resolveAtomicMassValue(symbol, options) * count;
@@ -87,7 +87,7 @@ function compareHillOrder(a: string, b: string, hasCarbon: boolean): number {
  * unrounded and sum to 100 only up to floating-point error.
  */
 export function composition(formula: string, options?: MolarMassOptions): CompositionEntry[] {
-  const counts = parseFormulaCounts(formula);
+  const counts = parseFormulaCounts(formula, options);
   const massBySymbol = new Map<string, number>();
   let total = 0;
   for (const [symbol, count] of counts) {

@@ -5,7 +5,13 @@ import tseslint from 'typescript-eslint';
 import eslintConfigPrettier from 'eslint-config-prettier';
 
 export default defineConfig(
-  globalIgnores(['dist/**', 'coverage/**', 'node_modules/**', 'src/data/elements.ts']),
+  globalIgnores([
+    'dist/**',
+    'coverage/**',
+    'node_modules/**',
+    'src/data/elements.ts',
+    'src/isotopes/data.ts',
+  ]),
   js.configs.recommended,
   tseslint.configs.strictTypeChecked,
   tseslint.configs.stylisticTypeChecked,

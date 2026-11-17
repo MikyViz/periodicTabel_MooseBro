@@ -63,3 +63,24 @@ export class NoStandardAtomicWeightError extends Error {
     Object.setPrototypeOf(this, NoStandardAtomicWeightError.prototype);
   }
 }
+
+/**
+ * Thrown when an isotope lookup (`getIsotope`) specifies a known element
+ * but a mass number that is not in this library's bundled isotope dataset
+ * (natural isotopes plus each element's longest-lived known isotope).
+ */
+export class UnknownIsotopeError extends Error {
+  readonly symbol: string;
+  readonly massNumber: number;
+
+  constructor(symbol: string, massNumber: number) {
+    super(
+      `Unknown isotope: ${symbol}-${String(massNumber)} is not in the bundled isotope dataset ` +
+        '(natural isotopes plus each element\u2019s longest-lived known isotope).',
+    );
+    this.name = 'UnknownIsotopeError';
+    this.symbol = symbol;
+    this.massNumber = massNumber;
+    Object.setPrototypeOf(this, UnknownIsotopeError.prototype);
+  }
+}

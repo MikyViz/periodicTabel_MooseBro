@@ -259,13 +259,30 @@ export interface Isotope {
   atomicNumber: number;
   /** Mass number (A), i.e. protons + neutrons. */
   massNumber: number;
-  /** Measured isotopic mass, in u. */
-  mass: number;
-  /** Natural abundance as a fraction in [0, 1]. Omitted for synthetic isotopes. */
-  abundance?: number;
-  /** Half-life, in seconds. Omitted for stable isotopes. */
-  halfLife?: number;
-  /** Known decay modes, omitted for stable isotopes. */
-  decayModes?: readonly DecayMode[];
+  /** IUPAC element symbol, matches the parent {@link Element.symbol}. */
+  symbol: string;
+  /** Isotopic mass, in u. */
+  mass: {
+    value: number;
+    /** Standard uncertainty in the same unit, or `null` if not reported by the source. */
+    uncertainty: number | null;
+  };
+  /**
+   * Natural abundance as a mole fraction in [0, 1], or `null` for isotopes
+   * with no measured natural occurrence (all synthetic-only isotopes).
+   */
+  abundance: {
+    value: number;
+    uncertainty: number | null;
+  } | null;
+  /** Half-life, in seconds; `null` for stable isotopes. */
+  halfLifeSeconds: number | null;
   stable: boolean;
+  /**
+   * Known decay modes (e.g. `'alpha'`, `'beta-minus'`), empty for stable
+   * isotopes. Typed as {@link DecayMode} (which also accepts arbitrary
+   * strings) rather than plain `string[]` so common modes still get
+   * autocomplete.
+   */
+  decayModes: readonly DecayMode[];
 }

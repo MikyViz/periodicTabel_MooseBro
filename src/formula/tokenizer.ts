@@ -3,16 +3,12 @@
  * the whole formula) so every token carries its exact source position for
  * precise error reporting.
  *
- * Design note on `.` as a hydrate separator: per the grammar this module
- * implements, a literal `.` is *always* a hydrate/adduct separator (same as
- * `·`/`•`/`*`), never a decimal point — there is no separate "decimal
- * number" token. This means a non-integer subscript like "H2.5O" is not
- * specially detected as such; it will either parse as an (unusual but
- * well-defined) hydrate expression (coefficient 5 applied to the "O" that
- * follows) or fail for an unrelated structural reason (e.g. a trailing
- * coefficient with nothing after it). This is a deliberate consequence of
- * reusing the same character for both roles, consistent with the stated
- * out-of-scope status of non-stoichiometric (decimal) counts.
+ * Design note on `.` as a hydrate separator: a literal `.` is structurally
+ * indistinguishable from a decimal point using only local context (e.g. in
+ * "CuSO4.5H2O", "4.5" looks exactly like a decimal number). Because of that
+ * ambiguity, `.` is only treated as a hydrate separator when the caller
+ * explicitly opts in via `{ dotSeparator: true }`; by default it is
+ * rejected with a hint to use `·`/`•`/`*` (always enabled) or the option.
  */
 import { InvalidFormulaError } from '../errors.js';
 
@@ -27,7 +23,14 @@ export interface Token {
   position: number;
 }
 
-const HYDRATE_SEPARATORS = new Set(['\u00b7', '\u2022', '*', '.']);
+export interface TokenizeOptions {
+  /** Treat a literal `.` as a hydrate/adduct separator too. Default `false`. */
+  dotSeparator?: boolean;
+}
+
+// Always-on hydrate separators. `.` is handled separately since it is only
+// enabled when `options.dotSeparator` is true (see module doc above).
+const HYDRATE_SEPARATORS = new Set(['\u00b7', '\u2022', '*']);
 // Common Unicode superscript digits, for a friendlier "isotope notation
 // isn't supported" message instead of a generic "unexpected character" one.
 const SUPERSCRIPT_DIGITS = new Set([
@@ -57,7 +60,7 @@ function isWhitespace(ch: string): boolean {
 }
 
 /** Tokenizes a formula string, throwing `InvalidFormulaError` on any stray character. */
-export function tokenize(formula: string): Token[] {
+export function tokenize(formula: string, options?: TokenizeOptions): Token[] {
   const tokens: Token[] = [];
   let i = 0;
   const n = formula.length;
@@ -93,6 +96,20 @@ export function tokenize(formula: string): Token[] {
       tokens.push({ type: 'hydrate', value: ch, position: i });
       i++;
       continue;
+    }
+    if (ch === '.') {
+      if (options?.dotSeparator === true) {
+        tokens.push({ type: 'hydrate', value: ch, position: i });
+        i++;
+        continue;
+      }
+      throw new InvalidFormulaError(
+        formula,
+        '"." is not enabled as a hydrate separator; use "\u00b7", "\u2022", or "*", or pass ' +
+          '{ dotSeparator: true } to allow it',
+        i,
+        ch,
+      );
     }
     if (isDigit(ch)) {
       let j = i + 1;

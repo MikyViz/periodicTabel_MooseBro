@@ -5,7 +5,7 @@
  * scripts/build-data/raw-elements.ts. Edit the raw data and regenerate
  * instead of editing this file directly.
  *
- * Generated at: 2026-11-17T19:53:17.277Z
+ * Generated at: 2026-11-17T20:32:43.939Z
  */
 import type { DataSource, Element } from '../types.js';
 

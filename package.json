@@ -28,7 +28,8 @@
   },
   "scripts": {
     "build:data": "tsx scripts/build-data/generate.ts",
-    "build": "npm run build:data && tsup",
+    "build:isotopes": "tsx scripts/build-isotopes/generate.ts",
+    "build": "npm run build:data && npm run build:isotopes && tsup",
     "dev": "tsup --watch",
     "test": "vitest run",
     "test:watch": "vitest",

@@ -35,4 +35,4 @@ export { getElement, getElements, findElements } from './lookup/index.js';
 export type { ElementFilter, RangeFilter } from './lookup/index.js';
 
 export { parseFormula, molarMass, composition } from './formula/index.js';
-export type { MolarMassOptions, CompositionEntry } from './formula/index.js';
+export type { FormulaOptions, MolarMassOptions, CompositionEntry } from './formula/index.js';

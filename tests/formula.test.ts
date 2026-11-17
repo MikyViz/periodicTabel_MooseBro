@@ -45,6 +45,10 @@ describe('parseFormula: basic and nested structures', () => {
     expect(parseFormula('CuSO4\u00b75H2O')).toEqual({ Cu: 1, S: 1, O: 9, H: 10 });
   });
 
+  it('allows whitespace around a hydrate separator and its coefficient', () => {
+    expect(parseFormula('CuSO4 \u00b7 5 H2O')).toEqual({ Cu: 1, S: 1, O: 9, H: 10 });
+  });
+
   it('parses a hydrate separated by a literal asterisk (*)', () => {
     expect(parseFormula('CaCl2*2H2O')).toEqual({ Ca: 1, Cl: 2, H: 4, O: 2 });
   });
@@ -61,8 +65,8 @@ describe('parseFormula: basic and nested structures', () => {
     expect(parseFormula('C100H202')).toEqual({ C: 100, H: 202 });
   });
 
-  it('ignores whitespace between tokens', () => {
-    expect(parseFormula('Ca (OH) 2')).toEqual({ Ca: 1, O: 2, H: 2 });
+  it('allows whitespace between separate terms (not before a count)', () => {
+    expect(parseFormula('Ca (OH)2')).toEqual({ Ca: 1, O: 2, H: 2 });
   });
 
   it('merges repeated occurrences of the same element', () => {
@@ -195,6 +199,90 @@ describe('parseFormula: rejections', () => {
 
   it('rejects a lowercase letter starting a token', () => {
     expect(() => parseFormula('h2o')).toThrow(InvalidFormulaError);
+  });
+
+  it('rejects a leading zero in an element count', () => {
+    try {
+      parseFormula('H02');
+      expect.unreachable();
+    } catch (e) {
+      expect(e).toBeInstanceOf(InvalidFormulaError);
+      const err = e as InvalidFormulaError;
+      expect(err.message).toContain('leading zero');
+      expect(err.position).toBe(1);
+      expect(err.token).toBe('02');
+    }
+  });
+
+  it('rejects a leading zero in a group count', () => {
+    expect(() => parseFormula('(OH)03')).toThrow(InvalidFormulaError);
+  });
+
+  it('rejects a leading zero in a hydrate coefficient', () => {
+    expect(() => parseFormula('CuSO4\u00b705H2O')).toThrow(InvalidFormulaError);
+  });
+
+  it('rejects whitespace between an element and its own count', () => {
+    try {
+      parseFormula('H 2O');
+      expect.unreachable();
+    } catch (e) {
+      expect(e).toBeInstanceOf(InvalidFormulaError);
+      const err = e as InvalidFormulaError;
+      expect(err.message).toContain('whitespace is not allowed');
+      expect(err.position).toBe(2);
+    }
+  });
+
+  it('rejects whitespace between a closing group bracket and its own count', () => {
+    expect(() => parseFormula('Ca(OH) 2')).toThrow(InvalidFormulaError);
+  });
+
+  it('rejects "." as a hydrate separator by default, with a hint in the message', () => {
+    try {
+      parseFormula('CuSO4.5H2O');
+      expect.unreachable();
+    } catch (e) {
+      expect(e).toBeInstanceOf(InvalidFormulaError);
+      const err = e as InvalidFormulaError;
+      expect(err.message).toContain('dotSeparator');
+      expect(err.position).toBe(5);
+      expect(err.token).toBe('.');
+    }
+  });
+});
+
+describe('parseFormula: dotSeparator option', () => {
+  it('treats "." as a hydrate separator when dotSeparator is true', () => {
+    expect(parseFormula('CuSO4.5H2O', { dotSeparator: true })).toEqual({
+      Cu: 1,
+      S: 1,
+      O: 9,
+      H: 10,
+    });
+  });
+
+  it('still rejects "." when dotSeparator is explicitly false', () => {
+    expect(() => parseFormula('CuSO4.5H2O', { dotSeparator: false })).toThrow(InvalidFormulaError);
+  });
+
+  it('leaves the always-on separators (·, •, *) working regardless of dotSeparator', () => {
+    expect(parseFormula('CaCl2*2H2O')).toEqual({ Ca: 1, Cl: 2, H: 4, O: 2 });
+    expect(parseFormula('CaCl2*2H2O', { dotSeparator: false })).toEqual({
+      Ca: 1,
+      Cl: 2,
+      H: 4,
+      O: 2,
+    });
+  });
+
+  it('still allows whitespace around the separator and its coefficient with dotSeparator', () => {
+    expect(parseFormula('CuSO4 . 5 H2O', { dotSeparator: true })).toEqual({
+      Cu: 1,
+      S: 1,
+      O: 9,
+      H: 10,
+    });
   });
 });
 

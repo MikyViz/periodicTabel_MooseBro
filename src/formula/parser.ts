@@ -5,18 +5,25 @@
  *   formula    := sequence ( hydrate )*
  *   hydrate    := HYDRATE_SEP [ count ] sequence
  *   sequence   := term+
- *   term       := ELEMENT [ count ] | group [ count ]
+ *   term       := ELEMENT [ adjacentCount ] | group [ adjacentCount ]
  *   group      := '(' sequence ')' | '[' sequence ']'
- *   count      := NUMBER                      // integer, must be >= 1
+ *   count      := NUMBER                      // integer, must be >= 1, no leading zero
+ *   adjacentCount := count                     // must immediately follow, no whitespace
  *
  * `sequence` requires at least one term (an empty formula, an empty group
  * "()", and a hydrate separator with nothing following it are all errors).
+ * A count applying directly to an element or a closing group bracket must
+ * be adjacent (no intervening whitespace); the hydrate coefficient is the
+ * one exception and may still be separated by whitespace.
  */
 import { InvalidFormulaError, UnknownElementError } from '../errors.js';
 import { ELEMENTS } from '../data/elements.js';
-import { tokenize, type Token, type TokenType } from './tokenizer.js';
+import { tokenize, type Token, type TokenType, type TokenizeOptions } from './tokenizer.js';
 
 const VALID_SYMBOLS = new Set(ELEMENTS.map((el) => el.symbol));
+
+/** Options shared by {@link parseFormula}, `molarMass`, and `composition`. */
+export type FormulaOptions = TokenizeOptions;
 
 type ElementCounts = Map<string, number>;
 
@@ -79,6 +86,9 @@ class FormulaParser {
 
   private parseCount(): number {
     const token = this.advance();
+    if (token.value.length > 1 && token.value.startsWith('0')) {
+      this.fail('leading zeros are not allowed in counts', token);
+    }
     const value = Number(token.value);
     if (value === 0) {
       this.fail('count must be at least 1, got 0', token);
@@ -86,8 +96,30 @@ class FormulaParser {
     return value;
   }
 
+  /**
+   * Parses a count that may be separated from the preceding token by
+   * whitespace — used only for the optional hydrate coefficient, where
+   * whitespace around the separator (and its coefficient) remains allowed.
+   */
   private parseOptionalCount(): number {
     return this.peek().type === 'number' ? this.parseCount() : 1;
+  }
+
+  /**
+   * Parses a count that must immediately follow (no whitespace) the element
+   * or closing bracket it belongs to. `expectedPosition` is the character
+   * offset right after that preceding token; a `number` token starting
+   * anywhere else means whitespace separated them, which is rejected.
+   */
+  private parseAdjacentOptionalCount(expectedPosition: number): number {
+    const next = this.peek();
+    if (next.type !== 'number') {
+      return 1;
+    }
+    if (next.position !== expectedPosition) {
+      this.fail('whitespace is not allowed between an element or group and its count', next);
+    }
+    return this.parseCount();
   }
 
   private parseTerm(counts: ElementCounts): void {
@@ -98,7 +130,7 @@ class FormulaParser {
       if (!VALID_SYMBOLS.has(token.value)) {
         throw new UnknownElementError(token.value);
       }
-      const count = this.parseOptionalCount();
+      const count = this.parseAdjacentOptionalCount(token.position + token.value.length);
       counts.set(token.value, (counts.get(token.value) ?? 0) + count);
       return;
     }
@@ -125,7 +157,7 @@ class FormulaParser {
     }
     this.advance();
 
-    const count = this.parseOptionalCount();
+    const count = this.parseAdjacentOptionalCount(closeToken.position + 1);
     mergeInto(counts, inner, count);
   }
 
@@ -151,11 +183,11 @@ class FormulaParser {
  * entry point returning a `Map` (insertion order = first-seen order);
  * {@link parseFormula} wraps this into the public `Record` return type.
  */
-export function parseFormulaCounts(formula: string): ElementCounts {
+export function parseFormulaCounts(formula: string, options?: FormulaOptions): ElementCounts {
   if (formula.trim().length === 0) {
     throw new InvalidFormulaError(formula, 'formula must not be empty', 0);
   }
-  const tokens = tokenize(formula);
+  const tokens = tokenize(formula, options);
   return new FormulaParser(formula, tokens).parse();
 }
 
@@ -166,12 +198,18 @@ export function parseFormulaCounts(formula: string): ElementCounts {
  * uppercase letter can only be followed by a *lowercase* letter to form a
  * two-letter symbol).
  *
+ * By default, only `·`, `•`, and `*` are recognized as hydrate/adduct
+ * separators; pass `{ dotSeparator: true }` to also accept a literal `.`
+ * (disabled by default because it is structurally indistinguishable from a
+ * decimal point from local context alone — see the tokenizer's module doc).
+ *
  * @throws {InvalidFormulaError} on empty input, unbalanced/mismatched
- *   brackets, a zero count, charge/isotope notation, or any other
- *   unexpected/stray character.
+ *   brackets, a zero or leading-zero count, whitespace between an element
+ *   or group and its own count, charge/isotope notation, a disabled `.`
+ *   separator, or any other unexpected/stray character.
  * @throws {UnknownElementError} if a syntactically valid symbol token (e.g.
  *   "Xx") does not match any of the 118 known elements.
  */
-export function parseFormula(formula: string): Record<string, number> {
-  return Object.fromEntries(parseFormulaCounts(formula));
+export function parseFormula(formula: string, options?: FormulaOptions): Record<string, number> {
+  return Object.fromEntries(parseFormulaCounts(formula, options));
 }
