@@ -1,0 +1,62 @@
+{
+  "name": "periodic-table-ts",
+  "version": "0.1.0",
+  "description": "A modern, strictly-typed, zero-dependency periodic table library with rich sourced data, formula parsing, isotopes, and i18n.",
+  "type": "module",
+  "sideEffects": false,
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    },
+    "./isotopes": {
+      "types": "./dist/isotopes.d.ts",
+      "import": "./dist/isotopes.js",
+      "require": "./dist/isotopes.cjs"
+    },
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "dist"
+  ],
+  "engines": {
+    "node": ">=18.18"
+  },
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "lint": "eslint .",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "typecheck": "tsc --noEmit",
+    "prepublishOnly": "npm run build"
+  },
+  "keywords": [
+    "periodic-table",
+    "chemistry",
+    "elements",
+    "isotopes",
+    "typescript",
+    "formula-parser",
+    "molar-mass"
+  ],
+  "license": "MIT",
+  "author": "MikyViz",
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "@types/node": "^26.6.6",
+    "eslint": "^10.15.0",
+    "eslint-config-prettier": "^10.1.8",
+    "prettier": "^3.10.1",
+    "tsup": "^9.0.0",
+    "typescript": "^5.9.3",
+    "typescript-eslint": "^8.73.0",
+    "vitest": "^5.1.0"
+  }
+}

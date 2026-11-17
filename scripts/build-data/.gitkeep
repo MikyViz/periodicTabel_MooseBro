@@ -1,0 +1,1 @@
+// Data build pipeline (sources -> validated JSON -> generated TS) lands in Phase 2.
