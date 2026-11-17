@@ -93,11 +93,12 @@ export interface LocalizedNames {
  *   despite being radioactive (their natural isotopic composition is
  *   consistent enough to support one).
  * - `'conventional'`: the element's natural isotopic composition varies
- *   measurably by source material, so IUPAC publishes an interval; `value`
- *   here is IUPAC's conventional abridged value for general use (no
- *   `uncertainty`, since it is not a measurement uncertainty). Exactly 12
- *   elements currently have this status: H, Li, B, C, N, O, Mg, Si, S, Cl,
- *   Br, Tl.
+ *   measurably by source material, so IUPAC publishes an interval instead
+ *   of a single value (see {@link AtomicMass.interval}); `value` here is
+ *   IUPAC's conventional abridged value for general use (no `uncertainty`,
+ *   since it is not a measurement uncertainty). Exactly 14 elements
+ *   currently have this status: H, Li, B, C, N, O, Mg, Si, S, Cl, Ar, Br,
+ *   Tl, Pb.
  * - `'longest-lived-isotope'`: the element has no IUPAC standard atomic
  *   weight at all (no stable isotope and no consistent natural abundance);
  *   `value` is the mass number of the longest-lived known isotope, per
@@ -115,6 +116,13 @@ export interface AtomicMass {
   value: number;
   uncertainty?: number;
   kind: AtomicMassKind;
+  /**
+   * The CIAAW interval `[lower, upper]`, in u, for elements where `kind` is
+   * `'conventional'` — the actual source of truth for those 14 elements;
+   * `value` is merely the conventional abridged point value derived from
+   * it. `undefined` for `'standard'` and `'longest-lived-isotope'` kinds.
+   */
+  interval?: readonly [number, number];
 }
 
 /**
@@ -231,6 +239,16 @@ export interface Element {
   appearance?: string;
   /** Short free-text summary for display in UIs. */
   summary?: string;
+  /**
+   * Names of fields on this element whose present (non-null) value is
+   * estimated, extrapolated, or theoretically predicted rather than
+   * directly measured — e.g. a melting point approximated from a
+   * microgram-scale sample, or an electron configuration computed from
+   * relativistic theory for an element too heavy to have been
+   * spectroscopically observed. `undefined` (not an empty array) when
+   * every populated field on this element is a direct measurement.
+   */
+  estimated?: (keyof Element)[];
 }
 
 /**

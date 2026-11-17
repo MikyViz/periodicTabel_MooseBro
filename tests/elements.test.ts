@@ -229,6 +229,58 @@ describe('element data integrity', () => {
     expect(byClass.get('U')?.atomicMass).toMatchObject({ value: 238.02891, kind: 'standard' });
   });
 
+  it('has kind=conventional with a correct CIAAW interval for all 14 interval elements', () => {
+    const byClass = new Map<string, Element>(elements.map((el) => [el.symbol, el]));
+    const expected: Record<string, { value: number; interval: [number, number] }> = {
+      H: { value: 1.008, interval: [1.00784, 1.00811] },
+      Li: { value: 6.94, interval: [6.938, 6.997] },
+      B: { value: 10.81, interval: [10.806, 10.821] },
+      C: { value: 12.011, interval: [12.0096, 12.0116] },
+      N: { value: 14.007, interval: [14.00643, 14.00728] },
+      O: { value: 15.999, interval: [15.99903, 15.99977] },
+      Mg: { value: 24.305, interval: [24.304, 24.307] },
+      Si: { value: 28.085, interval: [28.084, 28.086] },
+      S: { value: 32.06, interval: [32.059, 32.076] },
+      Cl: { value: 35.45, interval: [35.446, 35.457] },
+      Ar: { value: 39.95, interval: [39.792, 39.963] },
+      Br: { value: 79.904, interval: [79.901, 79.907] },
+      Tl: { value: 204.38, interval: [204.382, 204.385] },
+      Pb: { value: 207.2, interval: [206.14, 207.94] },
+    };
+    expect(Object.keys(expected)).toHaveLength(14);
+    for (const [symbol, { value, interval }] of Object.entries(expected)) {
+      const el = byClass.get(symbol);
+      expect(el, `${symbol} should exist`).toBeDefined();
+      expect(el?.atomicMass.kind).toBe('conventional');
+      expect(el?.atomicMass.value).toBeCloseTo(value, 6);
+      expect(el?.atomicMass.uncertainty).toBeUndefined();
+      expect(el?.atomicMass.interval).toBeDefined();
+      expect(el?.atomicMass.interval?.[0]).toBeCloseTo(interval[0], 6);
+      expect(el?.atomicMass.interval?.[1]).toBeCloseTo(interval[1], 6);
+      expect(el?.atomicMass.interval?.[0]).toBeLessThan(el?.atomicMass.interval?.[1] ?? Infinity);
+    }
+  });
+
+  it('has no interval for standard or longest-lived-isotope elements', () => {
+    const byClass = new Map<string, Element>(elements.map((el) => [el.symbol, el]));
+    expect(byClass.get('Fe')?.atomicMass.interval).toBeUndefined();
+    expect(byClass.get('Tc')?.atomicMass.interval).toBeUndefined();
+  });
+
+  it('flags estimated/predicted fields via `estimated`, not silent guesses', () => {
+    const byClass = new Map<string, Element>(elements.map((el) => [el.symbol, el]));
+    expect(byClass.get('Ac')?.estimated).toEqual(
+      expect.arrayContaining(['meltingPoint', 'boilingPoint', 'density']),
+    );
+    expect(byClass.get('At')?.estimated).toContain('meltingPoint');
+    expect(byClass.get('Fm')?.estimated).toContain('ionizationEnergies');
+    expect(byClass.get('Md')?.estimated).toContain('ionizationEnergies');
+    expect(byClass.get('Rf')?.estimated).toEqual(
+      expect.arrayContaining(['electronConfiguration', 'shells']),
+    );
+    expect(byClass.get('Fe')?.estimated).toBeUndefined();
+  });
+
   it('known reference elements have the expected key properties', () => {
     const byClass = new Map<string, Element>(elements.map((el) => [el.symbol, el]));
     expect(byClass.get('H')?.atomicMass.value).toBeCloseTo(1.008, 3);

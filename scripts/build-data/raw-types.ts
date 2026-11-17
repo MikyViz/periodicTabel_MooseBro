@@ -1,6 +1,7 @@
 import type {
   AtomicMass,
   Block,
+  Element,
   ElementCategory,
   IonizationEnergy,
   LocalizedNames,
@@ -52,6 +53,8 @@ export interface RawElementInput {
   jmolColor?: string;
   appearance?: string;
   summary?: string;
+  /** See `Element.estimated` — fields whose value here is estimated/predicted, not measured. */
+  estimated?: (keyof Element)[];
 }
 
 /** Builds a `LocalizedNames` record (en/ru/he only — see `latinName` for Latin). */
@@ -66,9 +69,14 @@ export function standardMass(value: number, uncertainty?: number): AtomicMass {
     : { value, uncertainty, kind: 'standard' };
 }
 
-/** Builds an `AtomicMass` with `kind: 'conventional'` (one of the 12 IUPAC interval elements). */
-export function conventionalMass(value: number): AtomicMass {
-  return { value, kind: 'conventional' };
+/**
+ * Builds an `AtomicMass` with `kind: 'conventional'` (one of the 14 IUPAC
+ * interval elements). `interval` must be the exact `[lower, upper]` bound
+ * published by CIAAW (https://ciaaw.org/atomic-weights.htm) — not an
+ * estimate.
+ */
+export function conventionalMass(value: number, interval: readonly [number, number]): AtomicMass {
+  return { value, kind: 'conventional', interval };
 }
 
 /** Builds an `AtomicMass` with `kind: 'longest-lived-isotope'` (no IUPAC standard atomic weight). */

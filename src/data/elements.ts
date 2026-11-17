@@ -5,16 +5,16 @@
  * scripts/build-data/raw-elements.ts. Edit the raw data and regenerate
  * instead of editing this file directly.
  *
- * Generated at: 2026-11-17T19:27:21.218Z
+ * Generated at: 2026-11-17T19:53:17.277Z
  */
 import type { DataSource, Element } from '../types.js';
 
 export const ATOMIC_MASS_SOURCE: DataSource = {
-  "name": "CIAAW Standard Atomic Weights (IUPAC, 2021) / NIST SP 966",
+  "name": "CIAAW Standard Atomic Weights 2024 table (IUPAC \"Atomic Weights 2021\" report, with gadolinium/lutetium/zirconium revised by CIAAW in 2024) / NIST SP 966",
   "url": "https://ciaaw.org/atomic-weights.htm",
   "license": "Public domain / IUPAC factual data",
   "retrievedAt": "2026-11-17",
-  "notes": "See `AtomicMassKind` in src/types.ts for the 'standard' / 'conventional' / 'longest-lived-isotope' distinction. 'conventional' applies to exactly 12 elements (H, Li, B, C, N, O, Mg, Si, S, Cl, Br, Tl) with IUPAC interval atomic weights; 'longest-lived-isotope' applies to elements with no IUPAC standard atomic weight at all, where the mass number of the longest-lived known isotope is used by convention."
+  "notes": "See `AtomicMassKind` in src/types.ts for the 'standard' / 'conventional' / 'longest-lived-isotope' distinction. 'conventional' applies to exactly 14 elements (H, Li, B, C, N, O, Mg, Si, S, Cl, Ar, Br, Tl, Pb) with IUPAC interval atomic weights (see each element's `atomicMass.interval`); 'longest-lived-isotope' applies to elements with no IUPAC standard atomic weight at all, where the mass number of the longest-lived known isotope is used by convention. All values fetched directly from the live CIAAW table on 2026-11-17, not from memory. IMPORTANT: Gd (157.249(2)), Lu (174.966 69(5)), and Zr (91.222(3)) reflect the 2024 CIAAW revision and differ from older (pre-2024) reference tables you may be used to — please independently verify these three against the live CIAAW page before relying on them."
 };
 
 export const GROUND_STATE_CONFIG_SOURCE: DataSource = {
@@ -57,7 +57,11 @@ export const ELEMENTS: readonly Element[] = [
     },
     "atomicMass": {
       "value": 1.008,
-      "kind": "conventional"
+      "kind": "conventional",
+      "interval": [
+        1.00784,
+        1.00811
+      ]
     },
     "group": 1,
     "period": 1,
@@ -153,7 +157,11 @@ export const ELEMENTS: readonly Element[] = [
     },
     "atomicMass": {
       "value": 6.94,
-      "kind": "conventional"
+      "kind": "conventional",
+      "interval": [
+        6.938,
+        6.997
+      ]
     },
     "group": 1,
     "period": 2,
@@ -251,7 +259,11 @@ export const ELEMENTS: readonly Element[] = [
     },
     "atomicMass": {
       "value": 10.81,
-      "kind": "conventional"
+      "kind": "conventional",
+      "interval": [
+        10.806,
+        10.821
+      ]
     },
     "group": 13,
     "period": 2,
@@ -299,7 +311,11 @@ export const ELEMENTS: readonly Element[] = [
     },
     "atomicMass": {
       "value": 12.011,
-      "kind": "conventional"
+      "kind": "conventional",
+      "interval": [
+        12.0096,
+        12.0116
+      ]
     },
     "group": 14,
     "period": 2,
@@ -354,7 +370,11 @@ export const ELEMENTS: readonly Element[] = [
     },
     "atomicMass": {
       "value": 14.007,
-      "kind": "conventional"
+      "kind": "conventional",
+      "interval": [
+        14.00643,
+        14.00728
+      ]
     },
     "group": 15,
     "period": 2,
@@ -411,7 +431,11 @@ export const ELEMENTS: readonly Element[] = [
     },
     "atomicMass": {
       "value": 15.999,
-      "kind": "conventional"
+      "kind": "conventional",
+      "interval": [
+        15.99903,
+        15.99977
+      ]
     },
     "group": 16,
     "period": 2,
@@ -467,8 +491,8 @@ export const ELEMENTS: readonly Element[] = [
       "he": "פלואור"
     },
     "atomicMass": {
-      "value": 18.998403163,
-      "uncertainty": 6e-9,
+      "value": 18.998403162,
+      "uncertainty": 5e-9,
       "kind": "standard"
     },
     "group": 17,
@@ -614,7 +638,11 @@ export const ELEMENTS: readonly Element[] = [
     },
     "atomicMass": {
       "value": 24.305,
-      "kind": "conventional"
+      "kind": "conventional",
+      "interval": [
+        24.304,
+        24.307
+      ]
     },
     "group": 2,
     "period": 3,
@@ -713,7 +741,11 @@ export const ELEMENTS: readonly Element[] = [
     },
     "atomicMass": {
       "value": 28.085,
-      "kind": "conventional"
+      "kind": "conventional",
+      "interval": [
+        28.084,
+        28.086
+      ]
     },
     "group": 14,
     "period": 3,
@@ -825,7 +857,11 @@ export const ELEMENTS: readonly Element[] = [
     },
     "atomicMass": {
       "value": 32.06,
-      "kind": "conventional"
+      "kind": "conventional",
+      "interval": [
+        32.059,
+        32.076
+      ]
     },
     "group": 16,
     "period": 3,
@@ -880,7 +916,11 @@ export const ELEMENTS: readonly Element[] = [
     },
     "atomicMass": {
       "value": 35.45,
-      "kind": "conventional"
+      "kind": "conventional",
+      "interval": [
+        35.446,
+        35.457
+      ]
     },
     "group": 17,
     "period": 3,
@@ -945,7 +985,11 @@ export const ELEMENTS: readonly Element[] = [
     },
     "atomicMass": {
       "value": 39.95,
-      "kind": "standard"
+      "kind": "conventional",
+      "interval": [
+        39.792,
+        39.963
+      ]
     },
     "group": 18,
     "period": 3,
@@ -1091,8 +1135,8 @@ export const ELEMENTS: readonly Element[] = [
       "he": "סקנדיום"
     },
     "atomicMass": {
-      "value": 44.955908,
-      "uncertainty": 0.000005,
+      "value": 44.955907,
+      "uncertainty": 0.000004,
       "kind": "standard"
     },
     "group": 3,
@@ -1882,7 +1926,11 @@ export const ELEMENTS: readonly Element[] = [
     },
     "atomicMass": {
       "value": 79.904,
-      "kind": "conventional"
+      "kind": "conventional",
+      "interval": [
+        79.901,
+        79.907
+      ]
     },
     "group": 17,
     "period": 4,
@@ -2095,8 +2143,8 @@ export const ELEMENTS: readonly Element[] = [
       "he": "איטריום"
     },
     "atomicMass": {
-      "value": 88.90584,
-      "uncertainty": 0.00001,
+      "value": 88.905838,
+      "uncertainty": 0.000002,
       "kind": "standard"
     },
     "group": 3,
@@ -2147,8 +2195,8 @@ export const ELEMENTS: readonly Element[] = [
       "he": "זירקוניום"
     },
     "atomicMass": {
-      "value": 91.224,
-      "uncertainty": 0.002,
+      "value": 91.222,
+      "uncertainty": 0.003,
       "kind": "standard"
     },
     "group": 4,
@@ -3196,7 +3244,7 @@ export const ELEMENTS: readonly Element[] = [
     },
     "atomicMass": {
       "value": 140.90766,
-      "uncertainty": 0.00002,
+      "uncertainty": 0.00001,
       "kind": "standard"
     },
     "period": 6,
@@ -3462,8 +3510,8 @@ export const ELEMENTS: readonly Element[] = [
       "he": "גדוליניום"
     },
     "atomicMass": {
-      "value": 157.25,
-      "uncertainty": 0.03,
+      "value": 157.249,
+      "uncertainty": 0.002,
       "kind": "standard"
     },
     "period": 6,
@@ -3515,7 +3563,7 @@ export const ELEMENTS: readonly Element[] = [
     },
     "atomicMass": {
       "value": 158.925354,
-      "uncertainty": 0.000008,
+      "uncertainty": 0.000007,
       "kind": "standard"
     },
     "period": 6,
@@ -3834,8 +3882,8 @@ export const ELEMENTS: readonly Element[] = [
       "he": "לוטציום"
     },
     "atomicMass": {
-      "value": 174.9668,
-      "uncertainty": 0.0001,
+      "value": 174.96669,
+      "uncertainty": 0.00005,
       "kind": "standard"
     },
     "period": 6,
@@ -3887,8 +3935,8 @@ export const ELEMENTS: readonly Element[] = [
       "he": "הפניום"
     },
     "atomicMass": {
-      "value": 178.49,
-      "uncertainty": 0.02,
+      "value": 178.486,
+      "uncertainty": 0.006,
       "kind": "standard"
     },
     "group": 4,
@@ -4276,7 +4324,7 @@ export const ELEMENTS: readonly Element[] = [
     "latinName": "Aurum",
     "atomicMass": {
       "value": 196.96657,
-      "uncertainty": 0.00004,
+      "uncertainty": 0.000004,
       "kind": "standard"
     },
     "group": 11,
@@ -4389,7 +4437,11 @@ export const ELEMENTS: readonly Element[] = [
     },
     "atomicMass": {
       "value": 204.38,
-      "kind": "conventional"
+      "kind": "conventional",
+      "interval": [
+        204.382,
+        204.385
+      ]
     },
     "group": 13,
     "period": 6,
@@ -4446,8 +4498,11 @@ export const ELEMENTS: readonly Element[] = [
     "latinName": "Plumbum",
     "atomicMass": {
       "value": 207.2,
-      "uncertainty": 0.1,
-      "kind": "standard"
+      "kind": "conventional",
+      "interval": [
+        206.14,
+        207.94
+      ]
     },
     "group": 14,
     "period": 6,
@@ -4659,7 +4714,10 @@ export const ELEMENTS: readonly Element[] = [
     "discoveredBy": "Dale R. Corson, Kenneth Ross MacKenzie, and Emilio Segrè",
     "cpkColor": "#754F45",
     "jmolColor": "#754F45",
-    "appearance": "unknown; presumed a dark, metallic solid (never produced in visible quantities, predicted)"
+    "appearance": "unknown; presumed a dark, metallic solid (never produced in visible quantities, predicted)",
+    "estimated": [
+      "meltingPoint"
+    ]
   },
   {
     "atomicNumber": 86,
@@ -4864,7 +4922,12 @@ export const ELEMENTS: readonly Element[] = [
     "discoveredBy": "André-Louis Debierne",
     "cpkColor": "#70ABFA",
     "jmolColor": "#70ABFA",
-    "appearance": "silvery, radioactive metal that glows faintly blue in the dark"
+    "appearance": "silvery, radioactive metal that glows faintly blue in the dark",
+    "estimated": [
+      "meltingPoint",
+      "boilingPoint",
+      "density"
+    ]
   },
   {
     "atomicNumber": 90,
@@ -4929,7 +4992,7 @@ export const ELEMENTS: readonly Element[] = [
     },
     "atomicMass": {
       "value": 231.03588,
-      "uncertainty": 0.00002,
+      "uncertainty": 0.00001,
       "kind": "standard"
     },
     "period": 7,
@@ -5468,7 +5531,10 @@ export const ELEMENTS: readonly Element[] = [
     "discoveredBy": "Albert Ghiorso and collaborators",
     "cpkColor": "#B31FBA",
     "jmolColor": "#B31FBA",
-    "appearance": "unknown; presumed metallic solid (predicted, never produced in bulk)"
+    "appearance": "unknown; presumed metallic solid (predicted, never produced in bulk)",
+    "estimated": [
+      "ionizationEnergies"
+    ]
   },
   {
     "atomicNumber": 101,
@@ -5524,7 +5590,10 @@ export const ELEMENTS: readonly Element[] = [
     "discoveredBy": "Albert Ghiorso and collaborators",
     "cpkColor": "#B30DA6",
     "jmolColor": "#B30DA6",
-    "appearance": "unknown; presumed metallic solid (predicted, never produced in bulk)"
+    "appearance": "unknown; presumed metallic solid (predicted, never produced in bulk)",
+    "estimated": [
+      "ionizationEnergies"
+    ]
   },
   {
     "atomicNumber": 102,
@@ -5680,7 +5749,12 @@ export const ELEMENTS: readonly Element[] = [
     "discoveredBy": "Joint Institute for Nuclear Research",
     "cpkColor": "#CC0059",
     "jmolColor": "#CC0059",
-    "appearance": "unknown (predicted to resemble hafnium)"
+    "appearance": "unknown (predicted to resemble hafnium)",
+    "estimated": [
+      "electronConfiguration",
+      "shells",
+      "oxidationStates"
+    ]
   },
   {
     "atomicNumber": 105,
@@ -5728,7 +5802,12 @@ export const ELEMENTS: readonly Element[] = [
     "discoveredBy": "Joint Institute for Nuclear Research and Lawrence Berkeley National Laboratory",
     "cpkColor": "#D1004F",
     "jmolColor": "#D1004F",
-    "appearance": "unknown (predicted to resemble tantalum)"
+    "appearance": "unknown (predicted to resemble tantalum)",
+    "estimated": [
+      "electronConfiguration",
+      "shells",
+      "oxidationStates"
+    ]
   },
   {
     "atomicNumber": 106,
@@ -5776,7 +5855,12 @@ export const ELEMENTS: readonly Element[] = [
     "discoveredBy": "Lawrence Berkeley National Laboratory",
     "cpkColor": "#D90045",
     "jmolColor": "#D90045",
-    "appearance": "unknown (predicted to resemble tungsten)"
+    "appearance": "unknown (predicted to resemble tungsten)",
+    "estimated": [
+      "electronConfiguration",
+      "shells",
+      "oxidationStates"
+    ]
   },
   {
     "atomicNumber": 107,
@@ -5824,7 +5908,12 @@ export const ELEMENTS: readonly Element[] = [
     "discoveredBy": "GSI Helmholtz Centre for Heavy Ion Research",
     "cpkColor": "#E00038",
     "jmolColor": "#E00038",
-    "appearance": "unknown (predicted to resemble rhenium)"
+    "appearance": "unknown (predicted to resemble rhenium)",
+    "estimated": [
+      "electronConfiguration",
+      "shells",
+      "oxidationStates"
+    ]
   },
   {
     "atomicNumber": 108,
@@ -5872,7 +5961,12 @@ export const ELEMENTS: readonly Element[] = [
     "discoveredBy": "GSI Helmholtz Centre for Heavy Ion Research",
     "cpkColor": "#E6002E",
     "jmolColor": "#E6002E",
-    "appearance": "unknown (predicted to resemble osmium)"
+    "appearance": "unknown (predicted to resemble osmium)",
+    "estimated": [
+      "electronConfiguration",
+      "shells",
+      "oxidationStates"
+    ]
   },
   {
     "atomicNumber": 109,
@@ -5915,7 +6009,11 @@ export const ELEMENTS: readonly Element[] = [
     "discoveredBy": "GSI Helmholtz Centre for Heavy Ion Research",
     "cpkColor": "#EB0026",
     "jmolColor": "#EB0026",
-    "appearance": "unknown"
+    "appearance": "unknown",
+    "estimated": [
+      "electronConfiguration",
+      "shells"
+    ]
   },
   {
     "atomicNumber": 110,
@@ -5958,7 +6056,11 @@ export const ELEMENTS: readonly Element[] = [
     "discoveredBy": "GSI Helmholtz Centre for Heavy Ion Research",
     "cpkColor": null,
     "jmolColor": null,
-    "appearance": "unknown"
+    "appearance": "unknown",
+    "estimated": [
+      "electronConfiguration",
+      "shells"
+    ]
   },
   {
     "atomicNumber": 111,
@@ -6001,7 +6103,11 @@ export const ELEMENTS: readonly Element[] = [
     "discoveredBy": "GSI Helmholtz Centre for Heavy Ion Research",
     "cpkColor": null,
     "jmolColor": null,
-    "appearance": "unknown"
+    "appearance": "unknown",
+    "estimated": [
+      "electronConfiguration",
+      "shells"
+    ]
   },
   {
     "atomicNumber": 112,
@@ -6044,7 +6150,11 @@ export const ELEMENTS: readonly Element[] = [
     "discoveredBy": "GSI Helmholtz Centre for Heavy Ion Research",
     "cpkColor": null,
     "jmolColor": null,
-    "appearance": "predicted to be a volatile liquid or gas near room temperature, resembling mercury"
+    "appearance": "predicted to be a volatile liquid or gas near room temperature, resembling mercury",
+    "estimated": [
+      "electronConfiguration",
+      "shells"
+    ]
   },
   {
     "atomicNumber": 113,
@@ -6087,7 +6197,11 @@ export const ELEMENTS: readonly Element[] = [
     "discoveredBy": "RIKEN",
     "cpkColor": null,
     "jmolColor": null,
-    "appearance": "unknown (predicted to resemble a post-transition metal)"
+    "appearance": "unknown (predicted to resemble a post-transition metal)",
+    "estimated": [
+      "electronConfiguration",
+      "shells"
+    ]
   },
   {
     "atomicNumber": 114,
@@ -6130,7 +6244,11 @@ export const ELEMENTS: readonly Element[] = [
     "discoveredBy": "Joint Institute for Nuclear Research",
     "cpkColor": null,
     "jmolColor": null,
-    "appearance": "predicted to be an unusually volatile metal, possibly gas-like"
+    "appearance": "predicted to be an unusually volatile metal, possibly gas-like",
+    "estimated": [
+      "electronConfiguration",
+      "shells"
+    ]
   },
   {
     "atomicNumber": 115,
@@ -6173,7 +6291,11 @@ export const ELEMENTS: readonly Element[] = [
     "discoveredBy": "Joint Institute for Nuclear Research",
     "cpkColor": null,
     "jmolColor": null,
-    "appearance": "unknown (predicted to resemble bismuth)"
+    "appearance": "unknown (predicted to resemble bismuth)",
+    "estimated": [
+      "electronConfiguration",
+      "shells"
+    ]
   },
   {
     "atomicNumber": 116,
@@ -6216,7 +6338,11 @@ export const ELEMENTS: readonly Element[] = [
     "discoveredBy": "Joint Institute for Nuclear Research",
     "cpkColor": null,
     "jmolColor": null,
-    "appearance": "unknown (predicted to resemble polonium)"
+    "appearance": "unknown (predicted to resemble polonium)",
+    "estimated": [
+      "electronConfiguration",
+      "shells"
+    ]
   },
   {
     "atomicNumber": 117,
@@ -6268,7 +6394,12 @@ export const ELEMENTS: readonly Element[] = [
     "discoveredBy": "Joint Institute for Nuclear Research and Oak Ridge National Laboratory",
     "cpkColor": null,
     "jmolColor": null,
-    "appearance": "unknown (predicted to be a volatile, metallic-looking halogen analogue)"
+    "appearance": "unknown (predicted to be a volatile, metallic-looking halogen analogue)",
+    "estimated": [
+      "electronConfiguration",
+      "shells",
+      "oxidationStates"
+    ]
   },
   {
     "atomicNumber": 118,
@@ -6311,6 +6442,10 @@ export const ELEMENTS: readonly Element[] = [
     "discoveredBy": "Joint Institute for Nuclear Research",
     "cpkColor": null,
     "jmolColor": null,
-    "appearance": "unknown; predicted to be a solid at room temperature, unlike the lighter noble gases"
+    "appearance": "unknown; predicted to be a solid at room temperature, unlike the lighter noble gases",
+    "estimated": [
+      "electronConfiguration",
+      "shells"
+    ]
   }
 ];

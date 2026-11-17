@@ -1,10 +1,9 @@
 /**
  * Core public API barrel.
  *
- * Phase 2 adds element data, lookup, and filtering. `parseFormula`,
- * `molarMass`, and `composition` are added in Phase 3. Isotope data is
- * intentionally excluded from this entry point — see
- * `periodic-table-ts/isotopes` — to keep the core bundle small.
+ * Phase 3 adds the formula parser (`parseFormula`, `molarMass`,
+ * `composition`). Isotope data is intentionally excluded from this entry
+ * point — see `periodic-table-ts/isotopes` — to keep the core bundle small.
  */
 
 export type {
@@ -22,7 +21,7 @@ export type {
   StandardState,
 } from './types.js';
 
-export { InvalidFormulaError, UnknownElementError } from './errors.js';
+export { InvalidFormulaError, NoStandardAtomicWeightError, UnknownElementError } from './errors.js';
 
 export {
   ATOMIC_MASS_SOURCE,
@@ -34,3 +33,6 @@ export {
 
 export { getElement, getElements, findElements } from './lookup/index.js';
 export type { ElementFilter, RangeFilter } from './lookup/index.js';
+
+export { parseFormula, molarMass, composition } from './formula/index.js';
+export type { MolarMassOptions, CompositionEntry } from './formula/index.js';

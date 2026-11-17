@@ -89,6 +89,32 @@ export function validateElements(elements: readonly Element[]): void {
     if (el.atomicMass.kind !== 'standard' && el.atomicMass.uncertainty !== undefined) {
       problems.push(`${tag}: atomicMass.uncertainty should only be set when kind is 'standard'.`);
     }
+    if (el.atomicMass.kind === 'conventional') {
+      if (el.atomicMass.interval === undefined) {
+        problems.push(`${tag}: kind is 'conventional' but interval is missing.`);
+      } else {
+        const [lower, upper] = el.atomicMass.interval;
+        if (!(lower < upper)) {
+          problems.push(`${tag}: atomicMass.interval must have lower < upper.`);
+        }
+        // CIAAW's conventional abridged value is an independently rounded,
+        // easy-to-use figure (IUPAC Technical Report, "Atomic weights of
+        // the elements 2009", Table 3) — it is not guaranteed to fall
+        // strictly inside the tighter precision interval (e.g. O: 15.999 is
+        // just below its interval's 15.99903 lower bound; same for Tl).
+        // Allow a small tolerance rather than requiring strict containment.
+        const tolerance = 0.005;
+        if (el.atomicMass.value < lower - tolerance || el.atomicMass.value > upper + tolerance) {
+          problems.push(`${tag}: atomicMass.value is implausibly far from its own interval.`);
+        }
+      }
+    } else if (el.atomicMass.interval !== undefined) {
+      problems.push(`${tag}: atomicMass.interval should only be set when kind is 'conventional'.`);
+    }
+
+    if (el.estimated?.length === 0) {
+      problems.push(`${tag}: estimated should be undefined, not an empty array, when unused.`);
+    }
 
     if (!Number.isInteger(el.period) || el.period < 1 || el.period > 7) {
       problems.push(`${tag}: period must be an integer in [1, 7].`);

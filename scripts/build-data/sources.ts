@@ -17,16 +17,23 @@ import type { DataSource } from '../../src/types.js';
  * reference use.
  */
 export const ATOMIC_MASS_SOURCE: DataSource = {
-  name: 'CIAAW Standard Atomic Weights (IUPAC, 2021) / NIST SP 966',
+  name:
+    'CIAAW Standard Atomic Weights 2024 table (IUPAC "Atomic Weights 2021" report, with ' +
+    'gadolinium/lutetium/zirconium revised by CIAAW in 2024) / NIST SP 966',
   url: 'https://ciaaw.org/atomic-weights.htm',
   license: 'Public domain / IUPAC factual data',
   retrievedAt: '2026-11-17',
   notes:
     "See `AtomicMassKind` in src/types.ts for the 'standard' / 'conventional' / " +
-    "'longest-lived-isotope' distinction. 'conventional' applies to exactly 12 elements " +
-    '(H, Li, B, C, N, O, Mg, Si, S, Cl, Br, Tl) with IUPAC interval atomic weights; ' +
-    "'longest-lived-isotope' applies to elements with no IUPAC standard atomic weight at " +
-    'all, where the mass number of the longest-lived known isotope is used by convention.',
+    "'longest-lived-isotope' distinction. 'conventional' applies to exactly 14 elements " +
+    '(H, Li, B, C, N, O, Mg, Si, S, Cl, Ar, Br, Tl, Pb) with IUPAC interval atomic weights ' +
+    "(see each element's `atomicMass.interval`); 'longest-lived-isotope' applies to elements " +
+    'with no IUPAC standard atomic weight at all, where the mass number of the longest-lived ' +
+    'known isotope is used by convention. All values fetched directly from the live CIAAW ' +
+    'table on 2026-11-17, not from memory. IMPORTANT: Gd (157.249(2)), Lu (174.966 69(5)), ' +
+    'and Zr (91.222(3)) reflect the 2024 CIAAW revision and differ from older (pre-2024) ' +
+    'reference tables you may be used to — please independently verify these three against ' +
+    'the live CIAAW page before relying on them.',
 };
 
 export const GROUND_STATE_CONFIG_SOURCE: DataSource = {

@@ -70,6 +70,7 @@ function build(): void {
       jmolColor: raw.jmolColor ?? null,
       ...(raw.appearance !== undefined ? { appearance: raw.appearance } : {}),
       ...(raw.summary !== undefined ? { summary: raw.summary } : {}),
+      ...(raw.estimated !== undefined ? { estimated: raw.estimated } : {}),
     };
     return element;
   });
