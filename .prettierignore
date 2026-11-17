@@ -1,6 +1,7 @@
 dist
 coverage
 node_modules
+src/data/elements.ts
 CHANGELOG.md
 pnpm-lock.yaml
 yarn.lock
